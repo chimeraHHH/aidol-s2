@@ -5,7 +5,8 @@
   bottom: 0;
   height: calc(var(--tab-height) + var(--safe-bottom));
   padding: 8px 0 var(--safe-bottom);
-  background: var(--xm-glass);
+  /* 相对 --xm-glass(0.52) 透明度减半 → alpha ≈ 0.76 */
+  background: rgba(255, 255, 255, 0.76);
   backdrop-filter: var(--xm-glass-blur);
   -webkit-backdrop-filter: var(--xm-glass-blur);
   border-top: 1px solid var(--xm-glass-border);
