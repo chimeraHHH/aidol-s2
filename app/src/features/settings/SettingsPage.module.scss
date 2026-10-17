@@ -3,9 +3,9 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
-  /* 拉满 AppLayout 左右 gutter，避免标题旁出现竖向分界 */
+  /* 拉满 AppLayout 左右 gutter，内边距略收以让卡片更宽 */
   margin: 0 -22px;
-  padding: calc(var(--safe-top) + 10px) 22px 12px;
+  padding: calc(var(--safe-top) + 10px) 12px 12px;
   background: transparent;
   animation: rise 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -35,36 +35,6 @@
     opacity: 1;
     transform: none;
   }
-}
-
-.header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 2px 2px 4px;
-}
-
-.headerText {
-  min-width: 0;
-}
-
-.title {
-  margin: 0;
-  font-family: var(--xm-font-display);
-  font-size: 1.85rem;
-  font-weight: 600;
-  color: var(--xm-ink);
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-}
-
-.sub {
-  margin: 6px 0 0;
-  font-size: 0.82rem;
-  font-weight: 450;
-  color: var(--xm-ink-muted);
-  letter-spacing: 0.01em;
 }
 
 .hero {

@@ -4,13 +4,13 @@
   left: 0;
   right: 0;
   height: var(--safe-top);
-  padding: 11px 20px 0;
+  padding: 20px 18px 0;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   font-family: 'SF Pro Text', 'SF Pro Display', 'PingFang SC', system-ui, sans-serif;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 650;
   letter-spacing: -0.01em;
   color: var(--xm-ink);
   background: transparent;
@@ -21,18 +21,20 @@
 .left {
   display: flex;
   align-items: center;
-  gap: 5px;
-  min-width: 72px;
+  gap: 6px;
+  min-width: 84px;
 }
 
 .time {
   font-variant-numeric: tabular-nums;
   line-height: 1;
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 .silent {
-  width: 13px;
-  height: 13px;
+  width: 16px;
+  height: 16px;
   display: block;
   color: var(--xm-ink);
 }
@@ -40,20 +42,20 @@
 .icons {
   display: flex;
   align-items: center;
-  gap: 5px;
-  min-width: 78px;
+  gap: 6px;
+  min-width: 92px;
   justify-content: flex-end;
   color: var(--xm-ink);
 }
 
 .signal {
-  width: 17px;
-  height: 11px;
+  width: 20px;
+  height: 13px;
   display: block;
 }
 
 .network {
-  font-size: 0.72rem;
+  font-size: 0.84rem;
   font-weight: 700;
   letter-spacing: 0.01em;
   line-height: 1;
@@ -61,7 +63,7 @@
 }
 
 .battery {
-  width: 26px;
-  height: 12px;
+  width: 30px;
+  height: 14px;
   display: block;
 }

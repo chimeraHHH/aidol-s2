@@ -53,13 +53,6 @@ export function SettingsPage() {
     <div className={styles.page}>
       <div className={styles.atmosphere} aria-hidden />
 
-      <header className={styles.header}>
-        <div className={styles.headerText}>
-          <h1 className={styles.title}>我的</h1>
-          <p className={styles.sub}>咪酱的档案与设备</p>
-        </div>
-      </header>
-
       <section className={styles.hero} aria-label="猫咪资料">
         <div className={styles.bannerWrap}>
           <img
