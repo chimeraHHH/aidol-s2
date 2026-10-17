@@ -4,8 +4,6 @@
 > 把「称重 → 陪伴 → 健康洞察 → 社区发现」串成一条完整产品故事。
 
 <p align="center">
-  <img src="app/public/images/home-room.jpg" alt="小咪房间场景" width="280" />
-  &nbsp;
   <img src="app/public/images/companion/mijiang-lick-paw.gif" alt="咪酱舔爪动画" width="280" />
   &nbsp;
   <img src="app/public/images/xiaomi-product.jpg" alt="体脂秤产品图" width="280" />
