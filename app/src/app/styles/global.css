@@ -55,10 +55,12 @@ button {
   display: grid;
   place-items: center;
   padding: 32px 20px;
+  /* 更丰富的底色，让磨砂玻璃能“透”出层次 */
   background:
-    radial-gradient(ellipse 70% 50% at 80% 0%, rgba(196, 138, 90, 0.2), transparent 55%),
-    radial-gradient(ellipse 55% 45% at 10% 30%, rgba(107, 66, 53, 0.08), transparent 50%),
-    linear-gradient(165deg, #f8f6f3 0%, #efece8 48%, #e5e1db 100%);
+    radial-gradient(ellipse 75% 55% at 88% -5%, rgba(196, 138, 90, 0.42), transparent 58%),
+    radial-gradient(ellipse 60% 50% at 5% 35%, rgba(107, 66, 53, 0.18), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(232, 213, 200, 0.55), transparent 60%),
+    linear-gradient(165deg, #faf6f2 0%, #ebe6e0 48%, #dfd8d0 100%);
   position: relative;
   overflow: auto;
 }
@@ -80,6 +82,13 @@ button {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: var(--xm-glass);
+  border: 1px solid var(--xm-glass-border);
+  backdrop-filter: var(--xm-glass-blur-sm);
+  -webkit-backdrop-filter: var(--xm-glass-blur-sm);
+  box-shadow: var(--xm-glass-shadow);
 }
 
 .desktop-caption strong {
@@ -97,7 +106,11 @@ button {
 .mobile-stage {
   height: 100%;
   width: 100%;
-  background: var(--xm-cream-100);
+  background:
+    radial-gradient(ellipse 110% 70% at 100% -4%, rgba(196, 138, 90, 0.38), transparent 56%),
+    radial-gradient(ellipse 85% 55% at -8% 6%, rgba(107, 66, 53, 0.16), transparent 54%),
+    radial-gradient(ellipse 90% 48% at 40% 105%, rgba(232, 213, 200, 0.6), transparent 60%),
+    linear-gradient(168deg, #fcfaf8 0%, #f3f0ec 42%, #e9e4de 100%);
 }
 
 @media (max-width: 720px) {

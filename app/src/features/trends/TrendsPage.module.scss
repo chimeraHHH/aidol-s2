@@ -92,8 +92,11 @@
   gap: 6px;
   padding: 9px 14px;
   border-radius: 999px;
-  background: var(--xm-surface-strong);
-  box-shadow: var(--xm-shadow-card);
+  background: var(--xm-glass-strong);
+  border: 1px solid var(--xm-glass-border);
+  backdrop-filter: var(--xm-glass-blur-sm);
+  -webkit-backdrop-filter: var(--xm-glass-blur-sm);
+  box-shadow: var(--xm-glass-shadow);
   font-size: 0.84rem;
   font-weight: 650;
   color: var(--xm-brown);
@@ -213,10 +216,11 @@
   gap: 6px;
   padding: 22px 18px 18px;
   border-radius: 28px;
-  background: #fffcf8;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.7) inset,
-    0 18px 40px rgba(70, 50, 30, 0.07);
+  background: var(--xm-glass-strong);
+  border: 1px solid var(--xm-glass-border);
+  backdrop-filter: var(--xm-glass-blur-sm);
+  -webkit-backdrop-filter: var(--xm-glass-blur-sm);
+  box-shadow: var(--xm-glass-shadow);
 }
 
 .weightTop {
@@ -563,8 +567,11 @@
   gap: 5px;
   padding: 12px 14px;
   border-radius: 18px;
-  background: #fffcf8;
-  box-shadow: 0 8px 20px rgba(70, 50, 30, 0.04);
+  background: var(--xm-glass);
+  border: 1px solid var(--xm-glass-border);
+  backdrop-filter: var(--xm-glass-blur-sm);
+  -webkit-backdrop-filter: var(--xm-glass-blur-sm);
+  box-shadow: var(--xm-glass-shadow);
 }
 
 .sideTop {

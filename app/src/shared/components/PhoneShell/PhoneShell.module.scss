@@ -48,7 +48,11 @@
   height: var(--phone-height);
   border-radius: var(--phone-radius);
   overflow: hidden;
-  background: var(--xm-cream-100);
+  background: var(--xm-glass);
+  backdrop-filter: var(--xm-glass-blur);
+  -webkit-backdrop-filter: var(--xm-glass-blur);
+  border: 1px solid var(--xm-glass-border);
+  box-shadow: var(--xm-glass-shadow);
   isolation: isolate;
 }
 
@@ -102,7 +106,9 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--xm-cream-100);
+  background: var(--xm-glass);
+  backdrop-filter: var(--xm-glass-blur);
+  -webkit-backdrop-filter: var(--xm-glass-blur);
   position: relative;
   overflow: hidden;
 }

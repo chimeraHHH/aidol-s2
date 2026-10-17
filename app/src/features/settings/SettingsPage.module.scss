@@ -219,9 +219,11 @@
 .card {
   padding: 16px;
   border-radius: 24px;
-  background: #fffcf8;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  box-shadow: var(--xm-shadow-card);
+  background: var(--xm-glass-strong);
+  border: 1px solid var(--xm-glass-border);
+  backdrop-filter: var(--xm-glass-blur-sm);
+  -webkit-backdrop-filter: var(--xm-glass-blur-sm);
+  box-shadow: var(--xm-glass-shadow);
 }
 
 .cardHead {

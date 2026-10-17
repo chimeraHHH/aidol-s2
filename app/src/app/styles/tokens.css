@@ -24,8 +24,19 @@
   --xm-tan-soft: rgba(196, 138, 90, 0.16);
   --xm-success: #3cb371;
   --xm-danger: #e85d4c;
-  --xm-surface: rgba(255, 255, 255, 0.86);
-  --xm-surface-strong: #ffffff;
+  /* 磨砂玻璃：半透明白 + backdrop-filter */
+  --xm-glass: rgba(255, 255, 255, 0.52);
+  --xm-glass-strong: rgba(255, 255, 255, 0.72);
+  --xm-glass-soft: rgba(255, 255, 255, 0.38);
+  --xm-glass-border: rgba(255, 255, 255, 0.68);
+  --xm-glass-blur: blur(28px) saturate(180%);
+  --xm-glass-blur-sm: blur(16px) saturate(160%);
+  --xm-glass-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.55) inset,
+    0 8px 28px rgba(60, 45, 30, 0.08);
+
+  --xm-surface: var(--xm-glass-strong);
+  --xm-surface-strong: rgba(255, 255, 255, 0.88);
   --xm-hairline: rgba(31, 27, 23, 0.07);
 
   /* legacy aliases → brown system */

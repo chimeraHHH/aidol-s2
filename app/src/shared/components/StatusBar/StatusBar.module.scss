@@ -13,7 +13,14 @@
   font-weight: 650;
   letter-spacing: -0.01em;
   color: var(--xm-ink);
-  background: transparent;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.22) 70%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
   pointer-events: none;
   z-index: 50;
 }
