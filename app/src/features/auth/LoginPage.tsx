@@ -1,7 +1,8 @@
-import { useMemo, useState, type FormEvent } from 'react'
+import { useMemo, useRef, useState, type FormEvent } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useAppData } from '@/app/providers/AppDataProvider'
 import type { PersonaId } from '@/domain/types'
+import { useAvatarGenerateJob } from '@/features/settings/useAvatarGenerateJob'
 import {
   DEMO_ACCOUNTS,
   findAccountByPhone,
@@ -18,6 +19,7 @@ import styles from './LoginPage.module.scss'
 
 /** 全屏暖色猫窝主视觉（对齐 App 陪伴气质） */
 const HERO = '/images/auth/login-hero.jpg?v=4'
+const UPLOAD_PLACEHOLDER = '/images/paimomo/cat-avatar.jpg'
 
 const BREEDS = ['英短蓝猫', '布偶猫', '暹罗猫', '中华田园猫', '其他'] as const
 
@@ -27,13 +29,16 @@ const PERSONAS: Array<{ id: PersonaId; title: string; desc: string }> = [
   { id: 'cool', title: '冷静管家', desc: '少废话、看趋势，数据讲清楚' },
 ]
 
-type Step = 0 | 1 | 2
+/** 0 欢迎 → 1 登录注册 → 2 问卷 → 3 上传猫照 → 4 后台生成中 */
+type Step = 0 | 1 | 2 | 3 | 4
 type AuthMode = 'login' | 'register'
 
 export function LoginPage() {
   const navigate = useNavigate()
   const { refresh } = useAppData()
   const { isLoggedIn, login, lastPhone } = useAuthSession()
+  const { start: startGenerateJob, generating: avatarGenerating, job: avatarJob } =
+    useAvatarGenerateJob()
 
   const [step, setStep] = useState<Step>(0)
   const [authMode, setAuthMode] = useState<AuthMode>('register')
@@ -50,6 +55,10 @@ export function LoginPage() {
   const [birthday, setBirthday] = useState('2024-03-12')
   const [personaId, setPersonaId] = useState<PersonaId>('gentle')
   const [callUserAs, setCallUserAs] = useState('')
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+  const galleryInputRef = useRef<HTMLInputElement>(null)
 
   const phoneDigits = phone.replace(/\D/g, '').slice(0, 11)
 
@@ -61,7 +70,8 @@ export function LoginPage() {
 
   const canQuiz = Boolean(catName.trim() && breed && birthday && callUserAs.trim())
 
-  if (isLoggedIn) {
+  // 新建账号会在 step 3/4 停留上传形象；已登录且未进上传流程才回首页
+  if (isLoggedIn && step < 3) {
     return <Navigate to="/" replace />
   }
 
@@ -135,6 +145,12 @@ export function LoginPage() {
     }
   }
 
+  const finishEnterApp = async () => {
+    await refresh()
+    window.dispatchEvent(new CustomEvent('xm:user-account-changed'))
+    navigate('/home1', { replace: true })
+  }
+
   const onFinishQuiz = async () => {
     if (!pendingUserId) {
       setError('请先完成登录或注册')
@@ -163,9 +179,9 @@ export function LoginPage() {
       switchAccountStandalone(pendingUserId)
       login(phoneVal)
       await refresh()
-      // 确保账号昵称事件后 UI 立刻对齐
       window.dispatchEvent(new CustomEvent('xm:user-account-changed'))
-      navigate('/', { replace: true })
+      // 问卷后进入上传猫照，后台生成专属形象
+      setStep(3)
     } catch (err) {
       setError(err instanceof Error ? err.message : '保存失败')
     } finally {
@@ -173,13 +189,159 @@ export function LoginPage() {
     }
   }
 
-  return (
-    <div className={styles.page}>
-      <div className={styles.hero} aria-hidden>
-        <img className={styles.heroImg} src={HERO} alt="" draggable={false} />
-        <div className={step === 0 ? styles.veilWelcome : styles.veilSoft} />
-      </div>
+  const onPickPhoto = (file: File | undefined) => {
+    if (!file) return
+    setError(null)
+    if (photoPreview?.startsWith('blob:')) URL.revokeObjectURL(photoPreview)
+    setPhotoPreview(URL.createObjectURL(file))
+    const started = startGenerateJob(file)
+    if (!started) {
+      setError('已有生成任务在进行，请稍候或到「我的」查看进度')
+      return
+    }
+    setStep(4)
+  }
 
+  const onSkipPhoto = () => {
+    void finishEnterApp()
+  }
+
+  const onBackgroundGenerate = () => {
+    void finishEnterApp()
+  }
+
+  const uploadFlow = step >= 3
+
+  return (
+    <div className={`${styles.page}${uploadFlow ? ` ${styles.pageUpload}` : ''}`}>
+      {!uploadFlow ? (
+        <div className={styles.hero} aria-hidden>
+          <img className={styles.heroImg} src={HERO} alt="" draggable={false} />
+          <div className={step === 0 ? styles.veilWelcome : styles.veilSoft} />
+        </div>
+      ) : null}
+
+      {uploadFlow ? (
+        <div className={styles.uploadScreen} data-phone-screen>
+          {step === 3 ? (
+            <>
+              <header className={styles.uploadHead}>
+                <h1 className={styles.uploadTitle}>为 {catName.trim() || '猫猫'} 制作专属形象</h1>
+                <p className={styles.uploadHint}>
+                  拍一张或从相册选一张清晰正面照，窝知会在后台生成家居场景与陪伴形象。也可稍后在「我的 → 我的猫形象」补传。
+                </p>
+              </header>
+
+              <div className={styles.uploadPreview}>
+                <img
+                  src={photoPreview || UPLOAD_PLACEHOLDER}
+                  alt=""
+                  draggable={false}
+                />
+                {!photoPreview ? (
+                  <span className={styles.uploadPreviewTip}>预览区 · 建议光线充足、正面照</span>
+                ) : null}
+              </div>
+
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className={styles.hiddenFile}
+                onChange={(e) => {
+                  onPickPhoto(e.target.files?.[0])
+                  e.target.value = ''
+                }}
+              />
+              <input
+                ref={galleryInputRef}
+                type="file"
+                accept="image/*"
+                className={styles.hiddenFile}
+                onChange={(e) => {
+                  onPickPhoto(e.target.files?.[0])
+                  e.target.value = ''
+                }}
+              />
+
+              {error ? <p className={styles.uploadError}>{error}</p> : null}
+
+              <div className={styles.uploadActions}>
+                <button
+                  type="button"
+                  className={styles.btnPrimary}
+                  onClick={() => cameraInputRef.current?.click()}
+                >
+                  拍摄
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnGhostDark}
+                  onClick={() => galleryInputRef.current?.click()}
+                >
+                  从相册选择
+                </button>
+                <button type="button" className={styles.btnTextSkip} onClick={onSkipPhoto}>
+                  稍后再说，先进入窝知
+                </button>
+              </div>
+            </>
+          ) : null}
+
+          {step === 4 ? (
+            <>
+              <header className={styles.uploadHead}>
+                <h1 className={styles.uploadTitle}>正在生成专属形象…</h1>
+                <p className={styles.uploadHint}>
+                  静帧合成 → Seedance 动态视频 → 无缝循环，大约需要几分钟。可先去逛逛，完成后各页会自动更新。
+                </p>
+              </header>
+
+              <div className={styles.genVisual} aria-hidden>
+                <div className={styles.genDots}>
+                  {Array.from({ length: 36 }).map((_, i) => (
+                    <i key={i} style={{ ['--d' as string]: i }} />
+                  ))}
+                </div>
+                {photoPreview ? (
+                  <img className={styles.genThumb} src={photoPreview} alt="" draggable={false} />
+                ) : null}
+              </div>
+
+              <p className={styles.genStatus}>
+                {avatarJob.status === 'error'
+                  ? avatarJob.error || '生成失败，可稍后在「我的」重试'
+                  : avatarJob.status === 'success'
+                    ? avatarJob.tip || '生成完成'
+                    : avatarGenerating
+                      ? '后台生成中，请稍候…'
+                      : '准备开始生成…'}
+              </p>
+
+              <div className={styles.uploadActions}>
+                <button type="button" className={styles.btnPrimary} onClick={onBackgroundGenerate}>
+                  后台生成，进入窝知
+                </button>
+                {avatarJob.status === 'error' ? (
+                  <button
+                    type="button"
+                    className={styles.btnGhostDark}
+                    onClick={() => {
+                      setError(null)
+                      setStep(3)
+                    }}
+                  >
+                    重新选图
+                  </button>
+                ) : null}
+              </div>
+            </>
+          ) : null}
+        </div>
+      ) : null}
+
+      {!uploadFlow ? (
       <div
         className={`${styles.content} ${step === 0 ? styles.contentEnd : styles.contentScroll}`}
       >
@@ -421,12 +583,13 @@ export function LoginPage() {
                 disabled={!canQuiz || busy}
                 onClick={() => void onFinishQuiz()}
               >
-                {busy ? '正在进窝…' : '完成，进入窝知'}
+                {busy ? '正在保存…' : '下一步'}
               </button>
             </div>
           </div>
         )}
       </div>
+      ) : null}
     </div>
   )
 }

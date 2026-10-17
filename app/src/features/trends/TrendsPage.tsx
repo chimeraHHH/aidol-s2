@@ -408,7 +408,7 @@ function metricPic(id: LifestyleMetric['id']): string | null {
       return '/images/health/icon-sleep.jpg'
     case 'activity':
       return '/images/health/icon-activity.jpg'
-    case 'appetite':
+    case 'nestVisits':
       return '/images/health/icon-appetite.jpg'
     default:
       return null
@@ -471,15 +471,23 @@ function metricIcon(id: LifestyleMetric['id']): ReactNode {
           <circle cx="9.2" cy="16.5" r="1.6" stroke="currentColor" strokeWidth="1.5" />
         </svg>
       )
-    case 'appetite':
+    case 'nestVisits':
       return (
         <svg viewBox="0 0 24 24" fill="none" aria-hidden>
           <path
-            d="M12 20s-6.5-4.2-6.5-9.2A3.8 3.8 0 0 1 12 8.2a3.8 3.8 0 0 1 6.5 2.6C18.5 15.8 12 20 12 20Z"
+            d="M4.5 16.5c1.2-3.2 3.6-5 7.5-5s6.3 1.8 7.5 5"
             stroke="currentColor"
             strokeWidth="1.6"
-            strokeLinejoin="round"
+            strokeLinecap="round"
           />
+          <path
+            d="M9 11.5V8.2M12 11.2V7M15 11.5V8.2"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+          <circle cx="9" cy="14.2" r="1" fill="currentColor" />
+          <circle cx="15" cy="14.2" r="1" fill="currentColor" />
         </svg>
       )
     case 'energy':

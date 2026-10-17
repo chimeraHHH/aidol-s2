@@ -371,8 +371,178 @@
   color: var(--xm-ink, #2a221c);
 }
 
+/* —— 建档后：上传猫照 / 后台生成（对齐窝知暖色） —— */
+.pageUpload {
+  background: #f7f1ea;
+  color: #2a221c;
+}
+
+.uploadScreen {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--safe-top) + 20px) 24px calc(var(--safe-bottom) + 24px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.uploadHead {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.uploadTitle {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  color: #3d2c24;
+  line-height: 1.25;
+}
+
+.uploadHint {
+  margin: 10px 0 0;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: rgba(61, 44, 36, 0.68);
+}
+
+.uploadPreview {
+  position: relative;
+  width: min(100%, 320px);
+  aspect-ratio: 1;
+  margin: 8px auto 20px;
+  border-radius: 28px;
+  overflow: hidden;
+  background: #efe6dc;
+  border: 1px solid rgba(107, 66, 53, 0.1);
+  box-shadow: 0 16px 36px rgba(90, 60, 40, 0.12);
+}
+
+.uploadPreview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.uploadPreviewTip {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(28, 22, 18, 0.48);
+  color: #fff8f0;
+  font-size: 0.72rem;
+  text-align: center;
+  backdrop-filter: blur(8px);
+}
+
+.uploadActions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btnTextSkip {
+  min-height: 42px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: rgba(92, 61, 50, 0.72);
+  background: transparent;
+}
+
+.uploadError {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #c04a3c;
+}
+
+.hiddenFile {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.genVisual {
+  position: relative;
+  width: min(100%, 280px);
+  aspect-ratio: 1;
+  margin: 12px auto 18px;
+  display: grid;
+  place-items: center;
+}
+
+.genDots {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  padding: 18px;
+}
+
+.genDots i {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #c49a78;
+  opacity: 0.22;
+  animation: genPulse 1.6s ease-in-out infinite;
+  animation-delay: calc(var(--d) * 40ms);
+}
+
+.genThumb {
+  position: relative;
+  z-index: 1;
+  width: 42%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 22px;
+  border: 3px solid #fffcf8;
+  box-shadow: 0 12px 28px rgba(90, 60, 40, 0.2);
+}
+
+.genStatus {
+  margin: 0 0 16px;
+  text-align: center;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: rgba(61, 44, 36, 0.72);
+}
+
+@keyframes genPulse {
+  0%,
+  100% {
+    opacity: 0.18;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .page {
+    animation: none;
+  }
+
+  .genDots i {
     animation: none;
   }
 }

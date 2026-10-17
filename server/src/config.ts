@@ -73,7 +73,8 @@ export const config = {
   homeRoomCushionPath: path.resolve(rootDir, 'assets/home-room-cushion.jpg'),
   /** 视频任务轮询 */
   seedancePollMs: Number(process.env.SEEDANCE_POLL_MS || 4000),
-  seedanceTimeoutMs: Number(process.env.SEEDANCE_TIMEOUT_MS || 12 * 60 * 1000),
+  /** 云端视频最多等这么久，超时则静帧 + ffmpeg 兜底，避免前端代理 502 */
+  seedanceTimeoutMs: Number(process.env.SEEDANCE_TIMEOUT_MS || 3 * 60 * 1000),
   /** 原片时长（秒），无缝循环约为 2× */
   companionVideoDurationSec: Number(process.env.COMPANION_VIDEO_DURATION_SEC || 5),
 }

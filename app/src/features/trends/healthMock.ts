@@ -3,7 +3,7 @@
 import { getNestPresence } from './nestPresence'
 
 export interface LifestyleMetric {
-  id: 'nest' | 'sleep' | 'activity' | 'appetite' | 'energy'
+  id: 'nest' | 'sleep' | 'activity' | 'nestVisits' | 'energy'
   label: string
   value: string
   unit: string
@@ -41,7 +41,14 @@ export function buildHealthSnapshot(input: {
   const nest = getNestPresence(energy)
   const sleepHours = 14.2 + (energy % 10) * 0.05
   const activityMin = 38 + Math.round((100 - energy) * 0.12)
-  const appetitePct = 88 + (weekDelta !== null && weekDelta > 0 ? 4 : -2)
+  /** 猫窝秤可感知：今日上窝/踩秤次数（演示默认 6 次） */
+  const nestVisits = Math.max(
+    4,
+    Math.min(
+      8,
+      6 + (weekDelta !== null && Math.abs(weekDelta) > 0.05 ? (weekDelta > 0 ? 1 : -1) : 0),
+    ),
+  )
 
   const lifestyle: LifestyleMetric[] = [
     {
@@ -73,13 +80,13 @@ export function buildHealthSnapshot(input: {
       tone: activityMin < 40 ? 'ok' : 'good',
     },
     {
-      id: 'appetite',
-      label: '食欲',
-      value: String(Math.max(70, Math.min(98, appetitePct))),
-      unit: '%',
-      hint: '进食节奏平稳',
-      score: Math.max(70, Math.min(98, appetitePct)),
-      tone: 'good',
+      id: 'nestVisits',
+      label: '上窝次数',
+      value: String(nestVisits),
+      unit: '次',
+      hint: nestVisits >= 6 ? '进出窝节奏正常' : '今天上窝偏少',
+      score: Math.min(96, 58 + nestVisits * 6),
+      tone: nestVisits >= 5 ? 'good' : nestVisits >= 3 ? 'ok' : 'watch',
     },
     {
       id: 'energy',
@@ -100,7 +107,7 @@ export function buildHealthSnapshot(input: {
   let insight = `${name}整体状态不错，继续保持每日见面打卡。`
   if (score >= 88) {
     grade = '优秀'
-    insight = `${name}体重落在理想区间，睡眠与食欲也很稳，继续温柔陪伴就好。`
+    insight = `${name}体重落在理想区间，在窝与上窝节奏也很稳，继续温柔陪伴就好。`
   } else if (score < 72) {
     grade = '关注'
     insight = `${name}近期波动稍大，建议多观察进食与活动，必要时咨询宠物医生。`

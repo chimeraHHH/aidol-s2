@@ -4,6 +4,7 @@ import {
   readAvatarForUser,
   writeAvatarForUser,
 } from '@/features/auth/accountWorkspace'
+import { mediaUrl } from '@/shared/lib/apiBase'
 
 export type CustomCatAvatar = {
   /** 家居全景静帧 / 陪伴 poster（猫坐垫上） */
@@ -17,8 +18,19 @@ export type CustomCatAvatar = {
   mock?: boolean
 }
 
+/** 展示时把 /generated/... 接到当前 API 域名（本地代理或 VITE_API_BASE） */
+function withMediaHost(a: CustomCatAvatar | null): CustomCatAvatar | null {
+  if (!a) return null
+  return {
+    ...a,
+    imageUrl: mediaUrl(a.imageUrl) || a.imageUrl,
+    videoUrl: a.videoUrl ? mediaUrl(a.videoUrl) : undefined,
+    cutoutUrl: a.cutoutUrl ? mediaUrl(a.cutoutUrl) : undefined,
+  }
+}
+
 function read(): CustomCatAvatar | null {
-  return readAvatarForUser(getActiveUserId())
+  return withMediaHost(readAvatarForUser(getActiveUserId()))
 }
 
 function write(value: CustomCatAvatar | null) {

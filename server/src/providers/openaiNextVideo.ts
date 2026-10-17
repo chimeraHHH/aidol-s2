@@ -14,24 +14,55 @@ type TaskQueryResponse = {
   status?: string
   progress?: string
   fail_reason?: string
-  data?: {
-    video_url?: string
-    url?: string
-    output?: string | { url?: string }
-  }
+  data?: unknown
+  result?: unknown
+  content?: unknown
   error?: { message?: string }
   message?: string
+  [key: string]: unknown
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-function extractVideoUrl(q: TaskQueryResponse): string | undefined {
-  const data = q.data
-  if (!data) return undefined
-  if (typeof data.video_url === 'string' && data.video_url) return data.video_url
-  if (typeof data.url === 'string' && data.url) return data.url
-  if (typeof data.output === 'string' && data.output) return data.output
-  if (data.output && typeof data.output === 'object' && data.output.url) return data.output.url
+function looksLikeVideoUrl(s: string): boolean {
+  if (!/^https?:\/\//i.test(s)) return false
+  if (/\.(mp4|webm|mov)(\?|#|$)/i.test(s)) return true
+  if (/\/cdn\/|filesystem\.site|video/i.test(s)) return true
+  return false
+}
+
+/** 网关成功态字段不稳定：递归捞第一个像视频的 URL */
+function extractVideoUrl(q: unknown): string | undefined {
+  const seen = new Set<unknown>()
+  const stack: unknown[] = [q]
+  while (stack.length) {
+    const cur = stack.pop()
+    if (!cur || seen.has(cur)) continue
+    seen.add(cur)
+    if (typeof cur === 'string') {
+      if (looksLikeVideoUrl(cur)) return cur
+      continue
+    }
+    if (Array.isArray(cur)) {
+      for (const x of cur) stack.push(x)
+      continue
+    }
+    if (typeof cur === 'object') {
+      const obj = cur as Record<string, unknown>
+      for (const key of [
+        'video_url',
+        'url',
+        'output',
+        'file_url',
+        'download_url',
+        'video',
+      ]) {
+        const v = obj[key]
+        if (typeof v === 'string' && looksLikeVideoUrl(v)) return v
+      }
+      for (const v of Object.values(obj)) stack.push(v)
+    }
+  }
   return undefined
 }
 

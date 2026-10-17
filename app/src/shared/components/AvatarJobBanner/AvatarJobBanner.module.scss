@@ -3,7 +3,8 @@
   left: 12px;
   right: 12px;
   top: calc(var(--safe-top) + 6px);
-  z-index: 60;
+  /* 高于陪伴页聊天头 / TabBar，避免「关闭」点不到 */
+  z-index: 200;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -73,6 +74,25 @@
   font-weight: 700;
   color: var(--xm-brown);
   padding: 4px 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.closeBtn {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--xm-brown);
+  min-width: 44px;
+  min-height: 36px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(107, 66, 53, 0.08);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 @media (prefers-reduced-motion: reduce) {

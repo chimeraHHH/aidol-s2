@@ -1,16 +1,31 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAvatarGenerateJob } from '@/features/settings/useAvatarGenerateJob'
 import styles from './AvatarJobBanner.module.scss'
 
-/** 全局悬浮条：生成在后台跑时，切任何页面都能看到进度 */
+/** 当前账号的生成进度条（按账号隔离，切号不串状态） */
 export function AvatarJobBanner() {
   const navigate = useNavigate()
   const { job, dismissTip, clearError } = useAvatarGenerateJob()
+  /** 本地强制隐藏：防止状态未同步时「关闭」点不动 */
+  const [forceHidden, setForceHidden] = useState(false)
 
   const running = job.status === 'running'
   const failed = job.status === 'error'
   const ok = job.status === 'success'
+
+  useEffect(() => {
+    if (running) setForceHidden(false)
+  }, [running, job.version])
+
+  if (forceHidden && !running) return null
   if (!running && !failed && !ok) return null
+
+  const hideBanner = () => {
+    clearError()
+    dismissTip()
+    setForceHidden(true)
+  }
 
   return (
     <div
@@ -34,12 +49,12 @@ export function AvatarJobBanner() {
           </button>
         ) : null}
         {failed ? (
-          <button type="button" className={styles.link} onClick={() => clearError()}>
+          <button type="button" className={styles.closeBtn} onClick={hideBanner}>
             关闭
           </button>
         ) : null}
         {ok ? (
-          <button type="button" className={styles.link} onClick={() => dismissTip()}>
+          <button type="button" className={styles.closeBtn} onClick={hideBanner}>
             知道了
           </button>
         ) : null}

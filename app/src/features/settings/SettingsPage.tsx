@@ -150,7 +150,13 @@ export function SettingsPage() {
         <div className={styles.cardHead}>
           <h3>我的猫形象</h3>
           {customAvatar ? (
-            <span className={styles.statusOn}>{customAvatar.mock ? 'Mock' : '已生成'}</span>
+            <span className={styles.statusOn}>
+              {customAvatar.mock
+                ? 'Mock'
+                : customAvatar.videoUrl
+                  ? '已生成·含视频'
+                  : '已生成·仅静帧'}
+            </span>
           ) : (
             <span className={styles.statusOn}>默认场景</span>
           )}
@@ -218,10 +224,15 @@ export function SettingsPage() {
         </div>
         {generating ? (
           <p className={styles.avatarStatus}>
-            后台生成中：合成静帧 → 原片视频 → 无缝循环。可切换到其他页面，完成后自动替换各页头像。
+            后台生成中：静帧 → Seedance 动态视频（常需 2–8 分钟）→ 无缝循环。可继续浏览，完成后自动替换；动态效果请到「陪伴」页查看。
           </p>
         ) : null}
         {genTip && !generating ? <p className={styles.avatarTip}>{genTip}</p> : null}
+        {!generating && customAvatar?.videoUrl ? (
+          <p className={styles.avatarTip}>
+            已附带循环视频，打开底部「陪伴」即可看到会动的家居背景。
+          </p>
+        ) : null}
         {genError ? <p className={styles.avatarError}>{genError}</p> : null}
       </section>
 

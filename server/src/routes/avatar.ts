@@ -41,6 +41,26 @@ avatarRouter.post('/generate', (req, res) => {
         buffer: req.file.buffer,
         mimetype: req.file.mimetype,
       })
+      const stages = result.stages || []
+      const ranCloudVideo =
+        stages.includes('draw-seedance') || stages.includes('ark-seedance')
+      const videoFallback = stages.includes('video-fallback-ffmpeg')
+      let tip: string
+      if (result.mock) {
+        tip =
+          '当前为 Mock 演示。配置 DRAW_API_KEY 后可生成真实静帧 + Seedance 动态视频。'
+      } else if (ranCloudVideo) {
+        tip =
+          '已完成：家居静帧 → Seedance 动态视频 → 无缝循环。请打开「陪伴」页查看会动的背景。'
+      } else if (videoFallback) {
+        tip =
+          '静帧与抠图已生成，但云端视频失败，已用静帧做成循环底片（几乎不动）。请重试生成以拉 Seedance。'
+      } else if (result.cutoutUrl) {
+        tip = '已完成家居静帧与循环视频，已应用到陪伴/首页等。'
+      } else {
+        tip = '已完成家居静帧与循环视频；抠图未成功时首页暂用全景图。'
+      }
+
       res.json({
         ok: true,
         imageUrl: result.imageUrl,
@@ -50,16 +70,15 @@ avatarRouter.post('/generate', (req, res) => {
         model: result.model,
         provider: result.provider,
         mock: result.mock,
-        stages: result.stages,
-        tip: result.mock
-          ? '当前为 Mock 演示场景。配置 DRAW_API_KEY 后生成真实家居坐垫全景 + 首页抠图。'
-          : result.cutoutUrl
-            ? '已完成：9:16 家居坐垫全景 → 首页抠图猫层 → 循环视频，已应用到陪伴/首页等。'
-            : '已完成家居坐垫全景与循环视频；抠图未成功时首页暂用全景图。',
+        stages,
+        tip,
       })
     } catch (e) {
       const message = e instanceof Error ? e.message : '生成失败'
-      res.status(502).json({ ok: false, error: message })
+      console.error('[avatar/generate] failed:', message)
+      if (!res.headersSent) {
+        res.status(502).json({ ok: false, error: message })
+      }
     }
   })
 })

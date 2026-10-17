@@ -1,5 +1,6 @@
 import { clearCompanionChatCache } from '@/features/home/companionChatCache'
 import { purgeUserWorkspace } from '@/features/auth/accountWorkspace'
+import { purgeAvatarJobForUser } from '@/services/avatarGenerateJob'
 
 const ONBOARD_KEY = 'xiaomi.onboarding.v1'
 const ANSWERS_KEY = 'xiaomi.onboardingAnswers.v1'
@@ -21,6 +22,7 @@ function removeFromJsonMap(key: string, userId: string) {
 export function purgeAccountLocalData(userId: string): void {
   clearCompanionChatCache(userId)
   purgeUserWorkspace(userId)
+  purgeAvatarJobForUser(userId)
   removeFromJsonMap(ONBOARD_KEY, userId)
   removeFromJsonMap(ANSWERS_KEY, userId)
   // 旧版聊天缓存键（若存在）

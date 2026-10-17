@@ -1,3 +1,5 @@
+import { apiUrl } from '@/shared/lib/apiBase'
+
 export type AvatarGenerateResponse = {
   ok: boolean
   imageUrl?: string
@@ -20,21 +22,29 @@ export async function generateCatAvatar(file: File): Promise<AvatarGenerateRespo
 
   let res: Response
   try {
-    res = await fetch('/api/avatar/generate', {
+    res = await fetch(apiUrl('/api/avatar/generate'), {
       method: 'POST',
       body: form,
     })
   } catch {
     throw new Error(
-      '连不上本地后端（8787）。请确认已在 server 目录执行 npm run start，且前端走 Vite 代理。',
+      '连不上生成服务。本地请启动 server（8787）；上线请配置 VITE_API_BASE 指向后端。',
     )
   }
 
+  const raw = await res.text()
   let data: AvatarGenerateResponse
   try {
-    data = (await res.json()) as AvatarGenerateResponse
+    data = JSON.parse(raw) as AvatarGenerateResponse
   } catch {
-    throw new Error(`生成接口返回异常（HTTP ${res.status}）`)
+    if (res.status === 502 || res.status === 504) {
+      throw new Error(
+        '生成中断（代理 502/504）。常见原因：后端重启、云端生图/视频超时。请确认 server 在跑后重试；静帧通常仍可成功。',
+      )
+    }
+    throw new Error(
+      `生成接口返回异常（HTTP ${res.status}）${raw.trim() ? `：${raw.slice(0, 120)}` : ''}`,
+    )
   }
   if (!res.ok || !data.ok) {
     throw new Error(data.error || `生成失败（HTTP ${res.status}）`)

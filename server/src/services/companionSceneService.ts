@@ -200,11 +200,26 @@ export async function generateCompanionSceneFromUpload(file: {
 
   if (!mock && (hasDrawKey() || hasArkKey())) {
     try {
-      const stillForVideo =
-        stillRemoteUrl ||
-        (() => {
-          throw new Error('缺少远端静帧 URL，跳过云端视频')
-        })()
+      // 网关静帧常只回 b64：用本地静帧压成 data URL 喂视频，禁止再因「无远端 URL」整段跳过
+      let stillForVideo = stillRemoteUrl
+      if (!stillForVideo?.startsWith('http')) {
+        const stillBuf = await fs.readFile(stillAbsPath)
+        const stillMime = stillAbsPath.toLowerCase().endsWith('.png')
+          ? 'image/png'
+          : 'image/jpeg'
+        const packed = await compressImageForDraw(stillBuf, stillMime)
+        stillForVideo = bufferToDataUrl(packed.buffer, packed.mimetype)
+        stages.push('still-dataurl-for-video')
+        console.log(
+          `[companionScene] video input from local still (${Math.round(packed.buffer.length / 1024)}KB data URL)`,
+        )
+      } else {
+        console.log('[companionScene] video input from remote still URL')
+      }
+
+      console.log(
+        `[companionScene] starting cloud video via ${hasDrawKey() ? 'draw/seedance' : 'ark/seedance'}…`,
+      )
       const videoResult = hasDrawKey()
         ? await new OpenAINextVideoGenerator().generate({
             prompt: COMPANION_VIDEO_PROMPT,
@@ -224,6 +239,7 @@ export async function generateCompanionSceneFromUpload(file: {
       await downloadToFile(videoResult.videoUrl, originalPath)
       stillModel = `${stillModel}+${videoResult.model}`
       stages.push(hasDrawKey() ? 'draw-seedance' : 'ark-seedance')
+      console.log('[companionScene] cloud video OK → ffmpeg seamless loop')
       return finishWithLoop({ provider, mock: false, ranCloudVideo: true })
     } catch (videoErr) {
       console.warn('[companionScene] video failed, fallback ffmpeg loop:', videoErr)

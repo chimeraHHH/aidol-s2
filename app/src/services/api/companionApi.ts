@@ -37,16 +37,23 @@ export type CompanionChatResponse = {
   error?: string
 }
 
+import { apiUrl } from '@/shared/lib/apiBase'
+import { scopedUserId } from '@/shared/lib/deviceId'
+
 export async function chatWithCompanion(input: {
   userId: string
   message: string
   history?: CompanionHistoryItem[]
   profile?: CompanionChatProfile
 }): Promise<CompanionChatResponse> {
-  const res = await fetch('/api/companion/chat', {
+  const res = await fetch(apiUrl('/api/companion/chat'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      ...input,
+      // 公网多用户：按「本机设备 + 账号」隔离服务端 Memory
+      userId: scopedUserId(input.userId),
+    }),
   })
 
   const data = (await res.json()) as CompanionChatResponse
