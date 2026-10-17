@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { useAppData } from '@/app/providers/AppDataProvider'
 import type { PersonaId } from '@/domain/types'
 import { useAvatarGenerateJob } from '@/features/settings/useAvatarGenerateJob'
+import { FIXED_QIUQIU_USER_ID } from '@/features/auth/fixedQiuqiuAccount'
 import {
   DEMO_ACCOUNTS,
   findAccountByPhone,
@@ -484,7 +485,7 @@ export function LoginPage() {
                   className={styles.chip}
                   onClick={() => void quickLogin(a)}
                 >
-                  {a.displayName}
+                  {a.userId === FIXED_QIUQIU_USER_ID ? '小林·秋秋' : a.displayName}
                 </button>
               ))}
             </div>

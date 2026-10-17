@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { isFixedQiuqiuUserId } from '@/features/auth/fixedQiuqiuAccount'
 import { useAuthSession } from '@/features/auth/useAuthSession'
 import {
   formatUserLabel,
@@ -24,6 +25,11 @@ export function AccountSettingsPage() {
   }
 
   const onDeleteAccount = (userId: string, label: string) => {
+    if (isFixedQiuqiuUserId(userId)) {
+      setError('「小林 · 秋秋」为固定演示账号，不能删除')
+      setTip(null)
+      return
+    }
     const isCurrent = userId === activeId
     const lastOne = accounts.length <= 1
     const msg = lastOne

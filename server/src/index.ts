@@ -1,41 +1,18 @@
-import cors from 'cors'
-import express from 'express'
-import fs from 'node:fs'
 import { config } from './config.js'
-import { avatarRouter } from './routes/avatar.js'
-import { companionRouter } from './routes/companion.js'
-import { healthRouter } from './routes/health.js'
-import { llmRouter } from './routes/llm.js'
+import { createApp } from './createApp.js'
 
-for (const dir of [config.uploadsDir, config.generatedDir]) {
-  fs.mkdirSync(dir, { recursive: true })
+const app = createApp()
+
+/** CloudBase / 云托管可直接 require 导出的 app */
+export default app
+export { app }
+
+if (process.env.TCB_RUN !== '1' && process.env.CLOUDBASE_RUN !== '1') {
+  app.listen(config.port, () => {
+    console.log(`[xiaomi-server] http://localhost:${config.port}`)
+    console.log(`[xiaomi-server] health → GET /api/health`)
+    console.log(`[xiaomi-server] avatar → POST /api/avatar/generate`)
+    console.log(`[xiaomi-server] llm    → POST /api/llm/chat | /api/llm/video`)
+    console.log(`[xiaomi-server] companion → POST /api/companion/chat | GET /api/companion/memory`)
+  })
 }
-
-const app = express()
-app.use(
-  cors({
-    origin: config.corsOrigin.split(',').map((s) => s.trim()),
-  }),
-)
-app.use(express.json({ limit: '16mb' }))
-
-app.use('/generated', express.static(config.generatedDir))
-app.use('/uploads', express.static(config.uploadsDir))
-
-app.use('/api', healthRouter)
-app.use('/api/llm', llmRouter)
-app.use('/api/companion', companionRouter)
-app.use('/api/avatar', avatarRouter)
-
-app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  const message = err instanceof Error ? err.message : 'server error'
-  res.status(500).json({ ok: false, error: message })
-})
-
-app.listen(config.port, () => {
-  console.log(`[xiaomi-server] http://localhost:${config.port}`)
-  console.log(`[xiaomi-server] health → GET /api/health`)
-  console.log(`[xiaomi-server] avatar → POST /api/avatar/generate`)
-  console.log(`[xiaomi-server] llm    → POST /api/llm/chat | /api/llm/video`)
-  console.log(`[xiaomi-server] companion → POST /api/companion/chat | GET /api/companion/memory`)
-})

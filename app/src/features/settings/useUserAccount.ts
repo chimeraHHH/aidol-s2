@@ -1,4 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  FIXED_QIUQIU_ACCOUNT,
+  FIXED_QIUQIU_USER_ID,
+  isFixedQiuqiuUserId,
+} from '@/features/auth/fixedQiuqiuAccount'
 import { clearCompanionChatCache } from '@/features/home/companionChatCache'
 import { purgeAccountLocalData } from '@/features/auth/purgeAccountData'
 import { resetWorkspaceForNewAccount } from '@/features/auth/resetNewAccountDefaults'
@@ -38,8 +43,9 @@ export const DEFAULT_USER_ACCOUNT: UserAccount = {
   localPrivacy: true,
 }
 
-/** 演示用可切换账号 */
+/** 演示用可切换账号（小林/秋秋为固定主账号） */
 export const DEMO_ACCOUNTS: UserAccount[] = [
+  { ...FIXED_QIUQIU_ACCOUNT },
   DEFAULT_USER_ACCOUNT,
   {
     userId: '10288',
@@ -68,10 +74,10 @@ function seedStore(seed?: UserAccount): AccountStore {
   if (seed) {
     const idx = accounts.findIndex((a) => a.userId === seed.userId)
     if (idx >= 0) accounts[idx] = { ...accounts[idx], ...seed }
-    else accounts.unshift({ ...DEFAULT_USER_ACCOUNT, ...seed })
+    else accounts.unshift({ ...FIXED_QIUQIU_ACCOUNT, ...seed })
   }
   return {
-    activeId: seed?.userId ?? DEFAULT_USER_ACCOUNT.userId,
+    activeId: seed?.userId ?? FIXED_QIUQIU_USER_ID,
     accounts,
   }
 }
@@ -244,6 +250,10 @@ export function useUserAccount() {
     const current = readStore()
     if (!current.accounts.some((a) => a.userId === userId)) {
       return { emptied: current.accounts.length === 0 }
+    }
+    // 固定账号不可删
+    if (isFixedQiuqiuUserId(userId)) {
+      return { emptied: false, switchedTo: current.activeId }
     }
 
     purgeAccountLocalData(userId)

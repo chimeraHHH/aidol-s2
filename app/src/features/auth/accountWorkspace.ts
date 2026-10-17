@@ -5,6 +5,9 @@ import {
 } from '@/services/mock/seed'
 import type { CatProfile, CompanionState, Measurement } from '@/domain/types'
 
+/** 与 fixedQiuqiuAccount 对齐，避免循环依赖 */
+const FIXED_QIUQIU_USER_ID = '33801'
+
 /** 与 settings/useCustomCatAvatar 对齐，避免循环依赖 */
 export type WorkspaceCatAvatar = {
   imageUrl: string
@@ -213,6 +216,7 @@ export function resetNonDaisyAccountsToDefaults(): void {
 
   for (const a of accounts) {
     if (daisyId && a.userId === daisyId) continue
+    if (a.userId === FIXED_QIUQIU_USER_ID) continue
     // 无 Daisy 时：不要清掉当前正在用的、刚从全局迁过来的那份
     if (!daisyId && a.userId === activeId) continue
     catMap[a.userId] = seedCatStore()
@@ -265,6 +269,7 @@ export function writeAvatarForUser(userId: string, value: WorkspaceCatAvatar | n
 }
 
 export function resetUserWorkspaceToDefaults(userId: string): void {
+  if (userId === FIXED_QIUQIU_USER_ID) return
   ensureWorkspaceMigrated()
   const catMap = readCatMap()
   catMap[userId] = seedCatStore()
@@ -273,6 +278,7 @@ export function resetUserWorkspaceToDefaults(userId: string): void {
 }
 
 export function purgeUserWorkspace(userId: string): void {
+  if (userId === FIXED_QIUQIU_USER_ID) return
   ensureWorkspaceMigrated()
   const catMap = readCatMap()
   delete catMap[userId]

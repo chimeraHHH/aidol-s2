@@ -11,6 +11,7 @@ export async function generateCatAvatarFromUpload(file: {
   imageUrl: string
   videoUrl: string
   originalVideoUrl?: string
+  cutoutUrl?: string
   model: string
   provider: string
   mock: boolean

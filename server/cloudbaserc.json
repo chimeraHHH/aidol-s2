@@ -1,0 +1,7 @@
+{
+  "envId": "verso-d9gytapbtc86f999d",
+  "$schema": "https://static.cloudbase.net/cli/cloudbaserc.schema.json",
+  "cloudrun": {
+    "name": "media-pipeline"
+  }
+}
