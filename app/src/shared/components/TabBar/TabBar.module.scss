@@ -5,13 +5,20 @@
   bottom: 0;
   height: calc(var(--tab-height) + var(--safe-bottom));
   padding: 8px 0 var(--safe-bottom);
-  /* 相对 --xm-glass(0.52) 透明度减半 → alpha ≈ 0.76 */
-  background: rgba(255, 255, 255, 0.76);
-  backdrop-filter: var(--xm-glass-blur);
-  -webkit-backdrop-filter: var(--xm-glass-blur);
-  border-top: 1px solid var(--xm-glass-border);
-  box-shadow: var(--xm-glass-shadow);
-  z-index: 30;
+  /* 近乎不透明，避免正文透出干扰图标可读性；保留轻微磨砂 */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 253, 250, 0.96) 0%,
+    #faf7f3 45%,
+    #f7f3ef 100%
+  );
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border-top: 1px solid rgba(120, 90, 60, 0.14);
+  box-shadow:
+    0 -1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 -12px 32px rgba(70, 50, 30, 0.12);
+  z-index: 40;
 }
 
 .scroller {
