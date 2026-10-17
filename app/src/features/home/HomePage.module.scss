@@ -1,0 +1,244 @@
+.page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  /* 撑满整屏（含状态栏下方区域），房间背景顶到最上 */
+  margin: 0 -22px;
+  padding: 0 22px 10px;
+  overflow: hidden;
+  animation: rise 0.4s ease both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.room {
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/home-kitten.jpg');
+  background-position: center 35%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+.roomPet {
+  filter: brightness(1.03) saturate(1.05);
+}
+
+.roomHit {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 26%;
+  bottom: 32%;
+  z-index: 3;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.veilTop {
+  position: absolute;
+  inset: 0 0 68% 0;
+  background: linear-gradient(
+    180deg,
+    rgba(250, 246, 239, 0.42) 0%,
+    rgba(250, 246, 239, 0.1) 60%,
+    transparent 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+.veilBottom {
+  position: absolute;
+  inset: 62% 0 0 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(244, 239, 230, 0.12) 20%,
+    rgba(244, 239, 230, 0.72) 68%,
+    #f4efe6 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+.sun {
+  position: absolute;
+  top: -12%;
+  right: -22%;
+  width: 78%;
+  height: 48%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 236, 200, 0.42) 0%,
+    rgba(255, 236, 200, 0.08) 50%,
+    transparent 72%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+.ui {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  pointer-events: none;
+  /* 内容从状态栏/灵动岛下方开始，背景仍全屏 */
+  padding-top: calc(var(--safe-top) + 4px);
+}
+
+.ui > * {
+  pointer-events: auto;
+}
+
+.deviceChip {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 8px 8px;
+  border-radius: var(--xm-radius-pill);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 6px 18px rgba(80, 60, 40, 0.07);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--xm-ink-soft);
+}
+
+.deviceThumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  object-fit: cover;
+  background: var(--xm-cream-200);
+  flex-shrink: 0;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--xm-ink-muted);
+  flex-shrink: 0;
+}
+
+.dotOn {
+  background: #6fbf63;
+  box-shadow: 0 0 0 3px rgba(111, 191, 99, 0.2);
+}
+
+.chipText {
+  white-space: nowrap;
+}
+
+.chevron {
+  margin-left: 2px;
+  color: var(--xm-ink-muted);
+  font-size: 1rem;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.greetingBlock {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hello {
+  margin: 0;
+  font-size: 2.05rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--xm-ink);
+  line-height: 1.12;
+}
+
+.helloSub {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 500;
+  color: var(--xm-ink-muted);
+}
+
+.streak {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: var(--xm-champagne-deep);
+  font-weight: 500;
+}
+
+.mascotSpacer {
+  flex: 1;
+  min-height: 260px;
+  pointer-events: none;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.primaryBtn {
+  display: grid;
+  grid-template-columns: 28px 1fr 20px;
+  align-items: center;
+  width: 100%;
+  min-height: 58px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  background: #c9a07a;
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(180, 130, 90, 0.28);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.primaryBtn:active {
+  transform: scale(0.985);
+}
+
+.btnLabel {
+  text-align: center;
+  justify-self: center;
+}
+
+.btnChevron {
+  justify-self: end;
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+.btnIcon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  justify-self: start;
+}

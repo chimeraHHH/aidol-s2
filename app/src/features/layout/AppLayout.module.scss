@@ -1,0 +1,32 @@
+.shell {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--xm-cream-100);
+  /* 全屏：内容顶到最上沿，StatusBar 透明叠在上面 */
+}
+
+.main {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0 22px calc(var(--tab-height) + var(--safe-bottom) + 8px);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.main::-webkit-scrollbar {
+  display: none;
+}
+
+.loading {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  color: var(--xm-ink-muted);
+  font-size: 0.9rem;
+}

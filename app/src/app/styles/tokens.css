@@ -1,0 +1,53 @@
+:root {
+  /* 奶油底 · 暖石墨字 · 香槟交互色（少量使用） */
+  --xm-cream-50: #fbf8f2;
+  --xm-cream-100: #f4efe6;
+  --xm-cream-200: #ebe3d6;
+  --xm-cream-300: #ddd2c0;
+  --xm-ink: #2f2c2a;
+  --xm-ink-soft: #5a554e;
+  --xm-ink-muted: #8a8378;
+  --xm-champagne: #c4a574;
+  --xm-champagne-soft: #d9c3a0;
+  --xm-champagne-deep: #a88b58;
+  --xm-champagne-glow: rgba(196, 165, 116, 0.28);
+  /* legacy aliases → champagne */
+  --xm-amber: var(--xm-champagne);
+  --xm-amber-soft: var(--xm-champagne-soft);
+  --xm-amber-glow: var(--xm-champagne-glow);
+  --xm-terracotta: var(--xm-champagne);
+  --xm-terracotta-deep: var(--xm-champagne-deep);
+  --xm-terracotta-soft: var(--xm-champagne-soft);
+  --xm-blush: #e4cfc4;
+  --xm-success: #6f8f6a;
+  --xm-danger: #b56858;
+  --xm-surface: rgba(255, 252, 247, 0.88);
+  --xm-surface-strong: #fffcf7;
+  --xm-hairline: rgba(47, 44, 42, 0.08);
+
+  /* 测量页数字：高对比、等宽、快速扫读 */
+  --xm-num: #1a1816;
+  --xm-num-unit: #6b655c;
+  --xm-font-num: 'Outfit', 'SF Pro Display', 'PingFang SC', sans-serif;
+
+  --xm-radius-sm: 14px;
+  --xm-radius-md: 22px;
+  --xm-radius-lg: 28px;
+  --xm-radius-pill: 999px;
+
+  --xm-font-display: 'Outfit', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+  --xm-font-body: 'Outfit', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+
+  --xm-shadow-soft: 0 16px 40px rgba(60, 48, 30, 0.1);
+  --xm-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+
+  --phone-width: 430px;
+  --phone-height: 932px;
+  --phone-radius: 55px;
+  --phone-bezel: 11px;
+  --safe-top: 54px;
+  --safe-bottom: 34px;
+  --tab-height: 64px;
+
+  color-scheme: light;
+}

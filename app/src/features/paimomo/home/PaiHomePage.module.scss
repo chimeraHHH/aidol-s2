@@ -1,0 +1,339 @@
+.page {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  background: #eceae6;
+}
+
+/* 小咪「首页1」：随内容撑开，完整展示 sheet 内全部组块（含智能设备） */
+.embed {
+  flex: none;
+  min-height: auto;
+  height: auto;
+}
+
+.menu {
+  position: absolute;
+  top: calc(var(--safe-top) + 56px);
+  right: 18px;
+  z-index: 20;
+  min-width: 160px;
+  padding: 6px 0;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.menuItem {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 0.92rem;
+  color: #2f2a26;
+}
+
+.menuItem + .menuItem {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.heroBlock {
+  padding: 0 18px 8px;
+}
+
+.greeting h1 {
+  margin: 0;
+  font-size: 1.7rem;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #1f1c1a;
+}
+
+.miniActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.miniBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  font-size: 1.1rem;
+}
+
+.heroCard {
+  margin-top: 14px;
+  position: relative;
+  min-height: 200px;
+  height: 210px;
+  border-radius: 28px;
+  background: #eef0f2;
+  overflow: visible;
+  box-shadow: 0 10px 28px rgba(40, 30, 20, 0.06);
+}
+
+.heroCopy {
+  position: relative;
+  z-index: 2;
+  padding: 22px 18px;
+  width: 46%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.scoreLabel {
+  font-size: 0.82rem;
+  color: #8a837c;
+}
+
+.score {
+  margin-top: 4px;
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: #1f1c1a;
+  line-height: 1.05;
+}
+
+.scoreOk {
+  margin-top: 4px;
+  font-size: 0.82rem;
+  color: #3cb371;
+  font-weight: 600;
+}
+
+.chatBtn {
+  margin-top: auto;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #6b4235;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.heroCatWrap {
+  position: absolute;
+  right: -6%;
+  bottom: -8%;
+  width: 62%;
+  height: 118%;
+  z-index: 3;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.heroCat {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 10px 18px rgba(40, 30, 20, 0.12));
+}
+
+.sheet {
+  margin-top: 10px;
+  background: #fff;
+  border-radius: 28px 28px 0 0;
+  padding: 10px 14px 24px;
+  min-height: 420px;
+}
+
+.handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: #ddd;
+  margin: 4px auto 14px;
+}
+
+.grid {
+  column-count: 2;
+  column-gap: 12px;
+}
+
+.card {
+  break-inside: avoid;
+  margin-bottom: 12px;
+  width: 100%;
+  text-align: left;
+  border-radius: 22px;
+  padding: 14px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  color: #1f1c1a;
+}
+
+.gray {
+  background: #f2f2f2;
+}
+
+.tan {
+  background: #c5a183;
+  color: #2a2018;
+}
+
+.tall {
+  min-height: 220px;
+}
+
+.cardIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.cardMeta {
+  font-size: 0.78rem;
+  opacity: 0.75;
+}
+
+.cardTitle {
+  margin-top: auto;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.cardSub {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.link {
+  font-size: 0.78rem;
+  color: #8b4a3a;
+  text-decoration: underline;
+  background: none;
+  padding: 0;
+  text-align: left;
+}
+
+.arrow {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  font-size: 0.85rem;
+  opacity: 0.55;
+}
+
+.weather {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.78rem;
+  color: #5a554e;
+}
+
+.weather strong {
+  font-size: 1.05rem;
+  color: #1f1c1a;
+}
+
+.weatherCat {
+  margin-top: auto;
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.vaxList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vaxList div {
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 0.78rem;
+  color: #8a837c;
+}
+
+.miniChart {
+  width: 100%;
+  height: 40px;
+}
+
+.modalMask {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(30, 24, 20, 0.35);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.modal {
+  width: min(100%, 340px);
+  background: #fff;
+  border-radius: 28px;
+  padding: 22px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal h2 {
+  margin: 0;
+  text-align: center;
+  font-size: 1.15rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #8a837c;
+}
+
+.field input,
+.field select {
+  border: none;
+  background: #f2f2f2;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font: inherit;
+  color: #1f1c1a;
+}
+
+.primary,
+.secondary {
+  border-radius: 16px;
+  padding: 14px;
+  font-weight: 600;
+}
+
+.primary {
+  background: #6b4235;
+  color: #fff;
+}
+
+.secondary {
+  background: #f2f2f2;
+  color: #1f1c1a;
+}
+
+.cancel {
+  padding: 8px;
+  color: #8a837c;
+  font-size: 0.9rem;
+}

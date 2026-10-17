@@ -1,0 +1,42 @@
+.page {
+  flex: 1;
+  min-height: 100%;
+  background: #fff8f0;
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--safe-top) + 80px) 28px calc(var(--safe-bottom) + 28px);
+}
+
+.content {
+  flex: 1;
+}
+
+.content h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.content p {
+  margin: 16px 0 0;
+  color: #6b6560;
+  line-height: 1.55;
+  font-size: 0.95rem;
+}
+
+.cta {
+  height: 54px;
+  border-radius: 999px;
+  background: #704238;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  box-shadow: 0 10px 24px rgba(112, 66, 56, 0.28);
+}
+
+.later {
+  margin-top: 12px;
+  height: 44px;
+  color: #8a837c;
+  font-size: 0.9rem;
+}

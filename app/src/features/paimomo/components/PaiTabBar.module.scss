@@ -1,0 +1,49 @@
+.bar {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--safe-bottom) + 8px);
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 10px 28px rgba(40, 30, 20, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+}
+
+.item {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: #6b6560;
+  border-radius: 50%;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.active {
+  color: #fff;
+}
+
+.active .icon {
+  background: #1f1c1a;
+  color: #fff;
+}
+
+.icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.icon svg {
+  width: 20px;
+  height: 20px;
+}

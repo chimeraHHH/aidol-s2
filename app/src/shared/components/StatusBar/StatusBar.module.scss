@@ -1,0 +1,96 @@
+.bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--safe-top);
+  padding: 14px 22px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--xm-ink);
+  background: transparent;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.time {
+  min-width: 54px;
+}
+
+.icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 54px;
+  justify-content: flex-end;
+}
+
+.signal,
+.wifi,
+.battery {
+  display: inline-block;
+  height: 11px;
+  border-radius: 2px;
+  background: var(--xm-ink);
+}
+
+.signal {
+  width: 17px;
+  clip-path: polygon(0 70%, 25% 70%, 25% 45%, 50% 45%, 50% 25%, 75% 25%, 75% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.wifi {
+  width: 15px;
+  height: 11px;
+  border-radius: 0;
+  background: transparent;
+  border: 1.5px solid var(--xm-ink);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  position: relative;
+}
+
+.wifi::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--xm-ink);
+  left: 50%;
+  bottom: 1px;
+  transform: translateX(-50%);
+}
+
+.battery {
+  width: 24px;
+  height: 11px;
+  border: 1.5px solid var(--xm-ink);
+  border-radius: 3px;
+  background: transparent;
+  position: relative;
+}
+
+.battery::before {
+  content: '';
+  position: absolute;
+  inset: 1.5px;
+  width: 70%;
+  background: var(--xm-ink);
+  border-radius: 1px;
+}
+
+.battery::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  top: 2.5px;
+  width: 2px;
+  height: 4px;
+  background: var(--xm-ink);
+  border-radius: 0 1px 1px 0;
+}

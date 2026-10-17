@@ -1,0 +1,285 @@
+.page {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% 18%, rgba(255, 248, 238, 0.9), transparent 62%),
+    #fdf8f2;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(var(--safe-top) + 4px) 28px calc(var(--safe-bottom) + 18px);
+  text-align: center;
+}
+
+/* —— 导航 —— */
+.nav {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  flex-shrink: 0;
+  margin-bottom: 8px;
+}
+
+.back {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  color: #3a2e26;
+  border-radius: 12px;
+  margin-left: -8px;
+}
+
+.back:active {
+  opacity: 0.55;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #3a2e26;
+}
+
+.navSpacer {
+  width: 40px;
+}
+
+/* —— 读数环 —— */
+.readout {
+  margin-top: 12px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.ring {
+  --ring-orange: #f0a04e;
+  --ring-orange-soft: #f6bd7a;
+  --ring-track: #eee3d5;
+  position: relative;
+  width: 236px;
+  height: 236px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.ringTrack {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from -90deg,
+    var(--ring-orange) 0%,
+    var(--ring-orange-soft) var(--progress, 0%),
+    var(--ring-track) var(--progress, 0%)
+  );
+  mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+  transition: background 0.35s ease;
+}
+
+.ringBusy .ringTrack {
+  background: conic-gradient(
+    from -90deg,
+    var(--ring-orange),
+    var(--ring-orange-soft),
+    var(--ring-track),
+    var(--ring-orange)
+  );
+  animation: spin 1.35s linear infinite;
+}
+
+.ringInner {
+  position: relative;
+  z-index: 1;
+  width: 196px;
+  height: 196px;
+  border-radius: 50%;
+  background: #fdf8f2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding-top: 4px;
+}
+
+.value {
+  font-family: var(--xm-font-num);
+  font-size: 4.1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+  color: #2f241c;
+}
+
+.valueLive {
+  animation: pulseNum 0.9s ease-in-out infinite;
+}
+
+.valuePlaceholder {
+  color: #d4c4b0;
+  font-weight: 600;
+}
+
+.unit {
+  margin-top: 2px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #6b5c4e;
+  letter-spacing: 0.02em;
+}
+
+/* —— 状态徽章 —— */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 8px 10px;
+  border-radius: var(--xm-radius-pill);
+  background: #f3e4d2;
+  color: #5c4634;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.badgeBusy {
+  padding: 8px 16px;
+  color: #8a6b4a;
+  background: rgba(233, 151, 74, 0.14);
+}
+
+.badgeIcon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #e9974a;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(233, 151, 74, 0.35);
+}
+
+/* —— 中央插画 —— */
+.hero {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px 0 4px;
+  pointer-events: none;
+}
+
+.heroImg {
+  width: 96%;
+  max-height: 100%;
+  object-fit: contain;
+  /* 抹掉 JPG 方底板，融进奶油色页面 */
+  mix-blend-mode: multiply;
+  filter: contrast(1.02) saturate(1.05) drop-shadow(0 14px 22px rgba(90, 60, 30, 0.12));
+  -webkit-mask-image: radial-gradient(
+    ellipse 72% 78% at 50% 52%,
+    #000 52%,
+    rgba(0, 0, 0, 0.85) 68%,
+    transparent 86%
+  );
+  mask-image: radial-gradient(
+    ellipse 72% 78% at 50% 52%,
+    #000 52%,
+    rgba(0, 0, 0, 0.85) 68%,
+    transparent 86%
+  );
+  transform-origin: 50% 80%;
+  animation: float 3.6s ease-in-out infinite;
+}
+
+.heroCelebrate {
+  animation: bounceIn 0.55s cubic-bezier(0.22, 1.2, 0.36, 1) both,
+    float 3.6s ease-in-out 0.55s infinite;
+}
+
+/* —— 底部操作 —— */
+.actions {
+  width: 100%;
+  max-width: 340px;
+  flex-shrink: 0;
+  margin-top: 8px;
+}
+
+.saveBtn {
+  background: #c4784a !important;
+  box-shadow: 0 12px 28px rgba(196, 120, 74, 0.32) !important;
+  border-radius: var(--xm-radius-pill) !important;
+  min-height: 56px;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+}
+
+.saveBtn:active {
+  filter: brightness(0.96);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pulseNum {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.72;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ringBusy .ringTrack,
+  .heroImg,
+  .heroCelebrate,
+  .valueLive {
+    animation: none;
+  }
+}

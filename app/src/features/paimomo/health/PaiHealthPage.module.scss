@@ -1,0 +1,158 @@
+.page {
+  flex: 1;
+  min-height: 100%;
+  background: #f3f1ec;
+  padding: calc(var(--safe-top) + 8px) 16px calc(var(--safe-bottom) + 28px);
+  position: relative;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.header h1 {
+  margin: 0;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.header button {
+  font-size: 1.6rem;
+}
+
+.top,
+.mid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.petCard,
+.weightCard,
+.record,
+.behavior {
+  background: #fff;
+  border-radius: 20px;
+}
+
+.petCard {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  min-height: 210px;
+}
+
+.petCard img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.petMeta strong {
+  display: block;
+  font-size: 1.05rem;
+}
+
+.petMeta span {
+  color: #8a837c;
+  font-size: 0.8rem;
+}
+
+.petCard em {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  font-style: normal;
+  font-size: 0.68rem;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f0d5c4;
+  color: #6b4235;
+}
+
+.weightCard {
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.weightCard span {
+  color: #8a837c;
+  font-size: 0.85rem;
+}
+
+.weightCard strong {
+  font-size: 1.7rem;
+}
+
+.update,
+.history {
+  height: 40px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.update {
+  background: #6b4235;
+  color: #fff;
+}
+
+.history {
+  background: #f2f2f2;
+}
+
+.mid {
+  margin-top: 12px;
+}
+
+.record {
+  padding: 14px;
+  text-align: left;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.record span {
+  color: #8a837c;
+}
+
+.record small {
+  margin-top: auto;
+  color: #b0aaa3;
+  font-size: 0.72rem;
+}
+
+.section {
+  margin: 18px 4px 8px;
+  color: #8a837c;
+  font-size: 0.85rem;
+}
+
+.behavior {
+  padding: 22px 16px;
+  color: #8a837c;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.fab {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--safe-bottom) + 18px);
+  transform: translateX(-50%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #e8e4de;
+  font-size: 1.6rem;
+  color: #2f2a26;
+}
