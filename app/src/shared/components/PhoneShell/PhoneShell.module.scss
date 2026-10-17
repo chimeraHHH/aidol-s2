@@ -104,6 +104,8 @@
 .bleed {
   width: 100%;
   height: 100%;
+  min-height: 0;
+  flex: 1;
   display: flex;
   flex-direction: column;
   background: var(--xm-glass);
@@ -111,6 +113,8 @@
   -webkit-backdrop-filter: var(--xm-glass-blur);
   position: relative;
   overflow: hidden;
+  /* 真机圆角屏：内容不贴死物理边缘时可略内收，安全区由 token 负责 */
+  border-radius: 0;
 }
 
 .bleed .content {
@@ -118,6 +122,10 @@
   inset: auto;
   flex: 1;
   min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .bleedIsland {

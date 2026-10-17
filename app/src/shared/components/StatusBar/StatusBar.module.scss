@@ -3,7 +3,8 @@
   top: 0;
   left: 0;
   right: 0;
-  height: var(--safe-top);
+  /* 略加高，给底部渐隐留过渡带，避免 blur 硬切 */
+  height: calc(var(--safe-top) + 22px);
   padding: 20px 18px 0;
   display: flex;
   align-items: flex-start;
@@ -13,16 +14,39 @@
   font-weight: 650;
   letter-spacing: -0.01em;
   color: var(--xm-ink);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.55) 0%,
-    rgba(255, 255, 255, 0.22) 70%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  background: transparent;
   pointer-events: none;
   z-index: 50;
+}
+
+/* 模糊层单独做纵向 mask，避免状态栏底部出现清晰分界线 */
+.bar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 248, 240, 0.42) 0%,
+    rgba(255, 248, 240, 0.16) 42%,
+    rgba(255, 248, 240, 0) 100%
+  );
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 38%,
+    rgba(0, 0, 0, 0.45) 68%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 38%,
+    rgba(0, 0, 0, 0.45) 68%,
+    transparent 100%
+  );
 }
 
 .left {

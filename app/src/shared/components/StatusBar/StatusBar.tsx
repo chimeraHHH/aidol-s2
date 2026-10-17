@@ -10,7 +10,7 @@ export function StatusBar() {
   }, [])
 
   return (
-    <div className={styles.bar} aria-hidden>
+    <div className={styles.bar} data-status-bar aria-hidden>
       <span className={styles.left}>
         <span className={styles.time}>{time}</span>
         <SilentIcon />

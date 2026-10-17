@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppData } from '@/app/providers/AppDataProvider'
+import { useCustomCatAvatar } from '@/features/settings/useCustomCatAvatar'
 import {
   formatDelta,
   formatKg,
@@ -8,6 +9,11 @@ import {
   formatShortDate,
 } from '@/shared/lib/format'
 import { buildHealthSnapshot, type LifestyleMetric } from './healthMock'
+import {
+  formatNestDelta,
+  formatNestHours,
+  getNestPresence,
+} from './nestPresence'
 import { WeightBoard } from './WeightBoard'
 import {
   SIM_ANALYSIS,
@@ -23,6 +29,11 @@ import {
 import styles from './TrendsPage.module.scss'
 
 export function TrendsPage() {
+  const { avatar: customAvatar } = useCustomCatAvatar()
+  const hasGeneratedFace = Boolean(customAvatar?.cutoutUrl || customAvatar?.imageUrl)
+  const catFace = hasGeneratedFace
+    ? customAvatar!.cutoutUrl || customAvatar!.imageUrl!
+    : '/images/paimomo/cat-avatar.jpg'
   const navigate = useNavigate()
   const { measurements, profile, companion } = useAppData()
   const [period, setPeriod] = useState<WeightPeriod>('day')
@@ -82,8 +93,13 @@ export function TrendsPage() {
     latest.weightKg >= idealRange.min &&
     latest.weightKg <= idealRange.max
 
-  const sleep = health.lifestyle.find((m) => m.id === 'sleep')
-  const rest = health.lifestyle.filter((m) => m.id !== 'sleep')
+  const nest = useMemo(
+    () => getNestPresence(companion?.energy ?? 78),
+    [companion?.energy],
+  )
+  const nestMetric = health.lifestyle.find((m) => m.id === 'nest')
+  /** 侧列保持三项，避免挤成细条 */
+  const rest = health.lifestyle.filter((m) => m.id !== 'nest').slice(0, 3)
 
   return (
     <div className={styles.page}>
@@ -118,8 +134,8 @@ export function TrendsPage() {
             aria-hidden
           >
             <img
-              className={styles.scoreAvatar}
-              src="/images/paimomo/cat-avatar.jpg"
+              className={`${styles.scoreAvatar}${hasGeneratedFace ? ` ${styles.scoreAvatarCutout}` : ''}`}
+              src={catFace}
               alt=""
               draggable={false}
             />
@@ -238,6 +254,13 @@ export function TrendsPage() {
 
         <div className={styles.statStrip} role="list">
           <div className={styles.stat} role="listitem">
+            <span className={styles.statLabel}>今日在窝</span>
+            <span className={styles.statValue}>
+              {formatNestHours(nest.todayHours)}
+              <em>小时</em>
+            </span>
+          </div>
+          <div className={styles.stat} role="listitem">
             <span className={styles.statLabel}>{meta.avgLabel}</span>
             <span className={styles.statValue}>
               {avgKg !== null ? avgKg.toFixed(2) : '—'}
@@ -290,26 +313,28 @@ export function TrendsPage() {
         />
       ) : null}
 
-      {/* 日常：睡眠主，其余侧列 */}
+      {/* 日常：在窝时长主，其余侧列 */}
       <section className={styles.life} aria-label="日常状态" style={{ ['--i' as string]: 2 }}>
         <h2 className={styles.sectionTitle}>日常节奏</h2>
         <div className={styles.lifeLayout}>
-          {sleep && (
-            <article className={`${styles.sleepFeature} ${toneClass(sleep.tone)}`}>
+          {nestMetric && (
+            <article className={`${styles.sleepFeature} ${toneClass(nestMetric.tone)}`}>
               <div className={styles.sleepHead}>
-                <span className={styles.metricPic} aria-hidden>
-                  <img src="/images/health/icon-sleep.jpg" alt="" />
+                <span className={styles.metricIcon} aria-hidden>
+                  {metricIcon('nest')}
                 </span>
-                <span className={styles.metricLabel}>睡眠</span>
+                <span className={styles.metricLabel}>今日在窝时长</span>
               </div>
               <div className={styles.sleepValue}>
-                {sleep.value}
-                <span>{sleep.unit}</span>
+                {nestMetric.value}
+                <span>{nestMetric.unit}</span>
               </div>
               <div className={styles.sleepBar} aria-hidden>
-                <span style={{ width: `${sleep.score}%` }} />
+                <span style={{ width: `${nestMetric.score}%` }} />
               </div>
-              <p className={styles.metricHint}>{sleep.hint}</p>
+              <p className={styles.metricHint}>
+                {formatNestDelta(nest.deltaHours)} · {nestMetric.hint}
+              </p>
             </article>
           )}
           <div className={styles.lifeSide}>
@@ -407,6 +432,25 @@ function ScaleIcon() {
 
 function metricIcon(id: LifestyleMetric['id']): ReactNode {
   switch (id) {
+    case 'nest':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path
+            d="M4.5 16.5c1.2-3.2 3.6-5 7.5-5s6.3 1.8 7.5 5"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+          <path
+            d="M7 11.2c.6-2.2 2.2-3.7 5-3.7s4.4 1.5 5 3.7"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+          <circle cx="9.2" cy="14.2" r="1" fill="currentColor" />
+          <circle cx="14.8" cy="14.2" r="1" fill="currentColor" />
+        </svg>
+      )
     case 'sleep':
       return (
         <svg viewBox="0 0 24 24" fill="none" aria-hidden>

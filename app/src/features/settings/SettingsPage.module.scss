@@ -3,8 +3,8 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
-  /* 拉满 AppLayout 左右 gutter，内边距略收以让卡片更宽 */
-  margin: 0 -22px;
+  /* 拉满 AppLayout 左右 gutter；真机用当前 main 左右 padding 对冲 */
+  margin: 0 -16px;
   padding: calc(var(--safe-top) + 10px) 12px 12px;
   background: transparent;
   animation: rise 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -90,11 +90,19 @@
   height: 76px;
   border-radius: 24px;
   object-fit: cover;
-  object-position: 50% 30%;
+  object-position: 50% 18%;
   border: 3px solid #fffcf8;
   box-shadow: 0 10px 22px rgba(70, 50, 30, 0.16);
   background: var(--xm-cream-200);
   flex-shrink: 0;
+}
+
+/* 生成抠图：完整装入框内，避免耳朵被裁掉 */
+.avatarCutout {
+  object-fit: contain;
+  object-position: center;
+  padding: 2px;
+  box-sizing: border-box;
 }
 
 .heroCopy {
@@ -299,6 +307,72 @@
   margin-top: 14px;
 }
 
+.avatarHint {
+  margin: 0 0 12px;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--xm-ink-muted);
+}
+
+.avatarPreviewRow {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.avatarPreview {
+  flex: 0 0 112px;
+  width: 112px;
+  height: 112px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--xm-cream-200);
+  border: 1px solid rgba(107, 66, 53, 0.08);
+}
+
+.avatarPreview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarActions {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hiddenFile {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.avatarStatus,
+.avatarTip,
+.avatarError {
+  margin: 10px 0 0;
+  font-size: 0.74rem;
+  line-height: 1.4;
+}
+
+.avatarStatus {
+  color: var(--xm-brown);
+}
+
+.avatarTip {
+  color: #2f8a58;
+}
+
+.avatarError {
+  color: #c04a3c;
+}
+
 .btnPrimary,
 .btnGhost {
   width: 100%;
@@ -409,6 +483,280 @@
 .aboutRow span:last-child {
   color: var(--xm-ink-muted);
   font-size: 0.82rem;
+}
+
+.fieldStack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--xm-ink-muted);
+}
+
+.fieldInput {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(107, 66, 53, 0.12);
+  background: rgba(255, 252, 248, 0.72);
+  font-size: 0.92rem;
+  font-weight: 550;
+  color: var(--xm-ink);
+}
+
+.fieldInput:focus {
+  outline: none;
+  border-color: rgba(107, 66, 53, 0.35);
+  box-shadow: 0 0 0 3px rgba(196, 138, 90, 0.16);
+}
+
+.fieldInput:disabled {
+  opacity: 0.7;
+  color: var(--xm-ink-muted);
+}
+
+.fieldHint {
+  margin: 0;
+  font-size: 0.7rem;
+  color: var(--xm-ink-muted);
+  line-height: 1.35;
+}
+
+.accountMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.accountChip {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(107, 66, 53, 0.08);
+  color: var(--xm-brown);
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.dangerBtn {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 8px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 650;
+  background: rgba(192, 74, 60, 0.1);
+  color: #c04a3c;
+}
+
+.dangerBtn:active {
+  transform: scale(0.98);
+}
+
+.navRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 0;
+  text-align: left;
+  border-top: 1px solid var(--xm-hairline);
+}
+
+.cardTitle + .navRow {
+  border-top: none;
+  padding-top: 8px;
+}
+
+.rowChevron {
+  flex-shrink: 0;
+  font-size: 1.35rem;
+  font-weight: 400;
+  line-height: 1;
+  color: #9a9186;
+}
+
+.subHeader {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  min-height: 40px;
+  margin-bottom: 4px;
+}
+
+.backBtn {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--xm-ink);
+  background: rgba(255, 252, 248, 0.55);
+}
+
+.subTitle {
+  margin: 0;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--xm-ink);
+}
+
+.subHeaderSpacer {
+  width: 40px;
+  height: 40px;
+}
+
+.accountList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.accountItem {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  text-align: left;
+  background: rgba(47, 44, 42, 0.035);
+  border: 1px solid transparent;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.accountItemOn {
+  background: rgba(196, 138, 90, 0.12);
+  border-color: rgba(196, 138, 90, 0.28);
+}
+
+.accountAvatar {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #d4a878, #6b4235);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.accountItemCopy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.accountItemCopy strong {
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: var(--xm-ink);
+}
+
+.accountItemCopy em {
+  font-style: normal;
+  font-size: 0.72rem;
+  color: var(--xm-ink-muted);
+}
+
+.accountCheck {
+  flex-shrink: 0;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(60, 179, 113, 0.14);
+  color: #2f8a58;
+  font-size: 0.68rem;
+  font-weight: 650;
+}
+
+.btnLogout {
+  width: 100%;
+  min-height: 46px;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: #c04a3c;
+  background: rgba(192, 74, 60, 0.08);
+  border: 1px solid rgba(192, 74, 60, 0.18);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.btnLogout:active {
+  transform: scale(0.98);
+  background: rgba(192, 74, 60, 0.12);
+}
+
+.btnDangerSolid {
+  width: 100%;
+  min-height: 46px;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: #fff;
+  background: #c04a3c;
+  box-shadow: 0 8px 18px rgba(192, 74, 60, 0.22);
+  transition: transform 0.15s ease;
+}
+
+.btnDangerSolid:active {
+  transform: scale(0.98);
+}
+
+.dangerStack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.accountRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.accountRow .accountItem {
+  min-width: 0;
+}
+
+.accountDelete {
+  flex-shrink: 0;
+  min-width: 52px;
+  padding: 0 12px;
+  border-radius: 16px;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: #c04a3c;
+  background: rgba(192, 74, 60, 0.08);
+  border: 1px solid rgba(192, 74, 60, 0.16);
+}
+
+.accountDelete:active {
+  background: rgba(192, 74, 60, 0.14);
 }
 
 @media (prefers-reduced-motion: reduce) {

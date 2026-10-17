@@ -23,6 +23,11 @@ export function TabBar() {
             className={({ isActive }) =>
               `${styles.item}${isActive ? ` ${styles.itemActive}` : ''}`
             }
+            onClick={() => {
+              if (tab.to === '/') {
+                window.dispatchEvent(new Event('xm:companion-play'))
+              }
+            }}
           >
             <span className={styles.icon}>
               <tab.icon />

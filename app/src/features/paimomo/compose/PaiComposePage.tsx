@@ -1,11 +1,20 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useCustomCatAvatar } from '@/features/settings/useCustomCatAvatar'
+import {
+  formatUserLabel,
+  useUserAccount,
+} from '@/features/settings/useUserAccount'
 import styles from './PaiComposePage.module.scss'
 
 const TOPICS = ['日常', '晒猫', '求助', '健康', '好物'] as const
 
 export function PaiComposePage() {
   const navigate = useNavigate()
+  const { account } = useUserAccount()
+  const { avatar: customAvatar } = useCustomCatAvatar()
+  const catFace =
+    customAvatar?.cutoutUrl || customAvatar?.imageUrl || '/images/paimomo/cat-avatar.jpg'
   const [text, setText] = useState('')
   const [topic, setTopic] = useState<(typeof TOPICS)[number]>('晒猫')
   const [hasCover, setHasCover] = useState(true)
@@ -39,9 +48,9 @@ export function PaiComposePage() {
 
       <form id="post-form" className={styles.form} onSubmit={onSubmit}>
         <div className={styles.author}>
-          <img src="/images/paimomo/cat-avatar.jpg" alt="" />
+          <img src={catFace} alt="" />
           <div>
-            <strong>用户08645</strong>
+            <strong>{account.displayName || formatUserLabel(account)}</strong>
             <span>分享给宠友圈</span>
           </div>
         </div>

@@ -16,6 +16,11 @@ import {
   simBoardSeries,
 } from './data/kittenSim'
 import {
+  formatNestDelta,
+  formatNestHours,
+  getNestPresence,
+} from './nestPresence'
+import {
   PERIODS,
   periodMeta,
   type SeriesPoint,
@@ -49,6 +54,7 @@ export function WeightBoard({
 
   const series = useMemo(() => simBoardSeries(period), [period])
   const analysis = SIM_ANALYSIS
+  const nest = useMemo(() => getNestPresence(), [])
   const latestIndex = Math.max(0, series.length - 1)
 
   useEffect(() => {
@@ -238,6 +244,22 @@ export function WeightBoard({
                     {analysis.stats.monthDeltaKg}
                   </span>
                   <span>波动 {analysis.stats.volatility60d}</span>
+                </div>
+
+                <div className={styles.nestCard} aria-label="今日在窝时长">
+                  <div className={styles.nestTop}>
+                    <span className={styles.nestLabel}>今日在窝时长</span>
+                    <span className={styles.nestHint}>{formatNestDelta(nest.deltaHours)}</span>
+                  </div>
+                  <div className={styles.nestValue}>
+                    <strong>{formatNestHours(nest.todayHours)}</strong>
+                    <em>小时</em>
+                    <span className={styles.nestAvg}>近 7 日均 {nest.weekAvgHours} 小时</span>
+                  </div>
+                  <div className={styles.nestBar} aria-hidden>
+                    <i style={{ width: `${nest.score}%` }} />
+                  </div>
+                  <p className={styles.nestCopy}>{nest.hint}</p>
                 </div>
               </div>
 

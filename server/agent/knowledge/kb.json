@@ -1,0 +1,274 @@
+{
+  "metadata": {
+    "name": "猫咪体重与健康信息知识库",
+    "version": "1.0.0",
+    "language": "zh-CN",
+    "updated_at": "2026-10-17",
+    "purpose": "供手机端 API 检索并生成个性化猫咪体重与健康信息回答",
+    "medical_scope": "健康信息与趋势管理，不用于疾病诊断"
+  },
+  "enums": {
+    "breed": {
+      "DOMESTIC_CHINESE": "中华田园猫",
+      "RAGDOLL": "布偶猫",
+      "BRITISH_SHORTHAIR": "英国短毛猫",
+      "SIAMESE": "暹罗猫",
+      "OTHER": "其他",
+      "UNKNOWN": "不确定"
+    },
+    "sex": {
+      "male": "公",
+      "female": "母",
+      "unknown": "未知"
+    },
+    "neuter_status": {
+      "neutered": "已绝育",
+      "intact": "未绝育",
+      "unknown": "未知"
+    },
+    "risk_level": ["info", "observe", "consult_vet", "urgent"]
+  },
+  "life_stages": [
+    {"id": "kitten", "min_months": 0, "max_months_exclusive": 12, "name": "幼猫", "focus": "生长轨迹，不套用成年品种范围"},
+    {"id": "young_adult", "min_months": 12, "max_months_exclusive": 84, "name": "青年成年猫", "focus": "绝育后和成年早期持续增重"},
+    {"id": "mature_adult", "min_months": 84, "max_months_exclusive": 132, "name": "成熟成年猫", "focus": "同时关注增重、减重和BCS"},
+    {"id": "senior", "min_months": 132, "max_months_exclusive": null, "name": "老年猫", "focus": "持续减重和肌肉流失"}
+  ],
+  "breed_references": [
+    {
+      "breed": "DOMESTIC_CHINESE",
+      "female_kg": null,
+      "male_kg": null,
+      "maturity_note": "个体体型差异大",
+      "usage": "不设置固定品种体重，使用个人基线和BCS",
+      "source_ids": []
+    },
+    {
+      "breed": "RAGDOLL",
+      "female_kg": {"min": 4.5, "max": 6.8},
+      "male_kg": {"min": 6.8, "max": 9.1},
+      "maturity_note": "大型、慢成熟，可能约4岁完全成熟",
+      "usage": "仅作为成年群体参考，不能单独判断肥胖",
+      "source_ids": ["SRC-TICA-RAGDOLL"]
+    },
+    {
+      "breed": "BRITISH_SHORTHAIR",
+      "female_kg": {"min": 3.6, "max": 5.0},
+      "male_kg": {"min": 4.5, "max": 7.3},
+      "maturity_note": "中大型、骨架和肌肉较厚",
+      "usage": "仅作为成年群体参考，不能单独判断肥胖",
+      "source_ids": ["SRC-TICA-BSH"]
+    },
+    {
+      "breed": "SIAMESE",
+      "female_kg": {"min": 2.3, "max": 3.6},
+      "male_kg": {"min": 3.6, "max": 5.4},
+      "maturity_note": "修长、骨架相对较轻",
+      "usage": "仅作为成年群体参考，不能单独判断肥胖",
+      "source_ids": ["SRC-TICA-SIAMESE"]
+    }
+  ],
+  "bcs_reference": [
+    {"scores": [1, 2, 3], "status": "偏瘦", "estimated_overweight_pct": null},
+    {"scores": [4, 5], "status": "理想", "estimated_overweight_pct": 0},
+    {"scores": [6], "status": "轻度超重", "estimated_overweight_pct": 10},
+    {"scores": [7], "status": "超重", "estimated_overweight_pct": 20},
+    {"scores": [8], "status": "肥胖", "estimated_overweight_pct": 30},
+    {"scores": [9], "status": "严重肥胖", "estimated_overweight_pct": 40}
+  ],
+  "field_priority": [
+    "vet_confirmed_bcs_or_target_weight",
+    "personal_weight_baseline",
+    "weight_trend",
+    "life_stage",
+    "sex",
+    "neuter_status_and_date",
+    "breed_reference"
+  ],
+  "knowledge_entries": [
+    {
+      "id": "KB-WEIGHT-001",
+      "topic": "breed_weight",
+      "title": "品种成年体重参考",
+      "question_examples": ["英短多重正常", "布偶8公斤正常吗", "暹罗是不是比较轻", "中华田园猫应该多重"],
+      "required_fields": ["breed", "sex", "birth_date", "stable_weight_g"],
+      "optional_fields": ["bcs_score", "personal_baseline_g"],
+      "answer_core": "品种体重是成年群体参考，不能单独判断胖瘦。中华田园猫不设置统一范围；布偶、英短、暹罗可在成年且性别已知时显示参考范围。",
+      "rules": ["幼猫不显示成年范围", "先判断BCS和个人趋势，再解释品种范围"],
+      "missing_data_prompt": "请补充猫咪的年龄、性别和BCS或近期体重趋势。",
+      "prohibited_claims": ["超过品种上限就是肥胖", "低于下限就是营养不良"],
+      "source_ids": ["SRC-TICA-RAGDOLL", "SRC-TICA-BSH", "SRC-TICA-SIAMESE", "SRC-WEIGHT-19M"]
+    },
+    {
+      "id": "KB-WEIGHT-002",
+      "topic": "weight_normality",
+      "title": "当前体重是否正常",
+      "question_examples": ["我家猫6公斤正常吗", "猫是不是太胖了", "这个体重健康吗"],
+      "required_fields": ["stable_weight_g", "birth_date", "sex", "breed"],
+      "optional_fields": ["bcs_score", "personal_baseline_g", "weight_30d_change_pct"],
+      "answer_core": "不能只凭公斤数判断。应依次结合生命阶段、BCS、个人历史基线与趋势、性别及品种参考。",
+      "missing_data_prompt": "请补充猫咪年龄、性别、绝育情况，以及是否容易摸到肋骨、能否看到腰线。",
+      "source_ids": ["SRC-AAHA-LIFESTAGE-2021", "SRC-WSAVA-BCS"]
+    },
+    {
+      "id": "KB-WEIGHT-003",
+      "topic": "age_weight",
+      "title": "年龄与体重",
+      "question_examples": ["猫几岁最容易胖", "老年猫变轻正常吗", "幼猫体重怎么看"],
+      "required_fields": ["birth_date", "daily_weight_g"],
+      "optional_fields": ["weight_90d_change_pct", "bcs_score", "mcs_score"],
+      "answer_core": "幼猫重点看生长轨迹；成年中期更需预防持续增重；老年猫持续减重或肌肉流失不能简单视为正常衰老。",
+      "safety": "老年猫持续减重并伴随食欲、饮水、排尿或活动变化时建议兽医评估。",
+      "source_ids": ["SRC-AAHA-LIFESTAGE-2021", "SRC-WEIGHT-19M", "SRC-CKD-WEIGHT"]
+    },
+    {
+      "id": "KB-WEIGHT-004",
+      "topic": "sex_weight",
+      "title": "性别与体重",
+      "question_examples": ["公猫是不是普遍更重", "母猫应该多重", "公母体重差多少"],
+      "required_fields": ["sex", "breed", "birth_date"],
+      "optional_fields": ["bcs_score", "personal_baseline_g"],
+      "answer_core": "同一品种中公猫通常体型更大，但性别只是群体影响，不能代替BCS和个人历史基线。",
+      "prohibited_claims": ["公猫胖一点一定没关系"],
+      "source_ids": ["SRC-WEIGHT-19M", "SRC-OBESITY-RISK"]
+    },
+    {
+      "id": "KB-WEIGHT-005",
+      "topic": "neuter_weight",
+      "title": "绝育与体重",
+      "question_examples": ["猫绝育后会变胖吗", "绝育后三个月胖了正常吗", "绝育后要少喂吗"],
+      "required_fields": ["neuter_status", "neuter_date", "sex"],
+      "optional_fields": ["bcs_score", "daily_food_g", "feeding_method", "activity_level", "weight_30d_change_pct"],
+      "answer_core": "绝育与增重风险增加有关，尤其应观察术后数月的体重、食量和活动变化，但并非所有猫都会变胖。",
+      "rules": ["比较绝育附近基线与术后4、8、12、24周趋势"],
+      "source_ids": ["SRC-AAHA-YOUNG-ADULT", "SRC-OBESITY-RISK"]
+    },
+    {
+      "id": "KB-WEIGHT-006",
+      "topic": "bcs",
+      "title": "BCS定义与使用",
+      "question_examples": ["BCS是什么", "怎么判断猫胖不胖", "体况评分怎么看"],
+      "required_fields": [],
+      "optional_fields": ["bcs_score", "bcs_source"],
+      "answer_core": "BCS是1至9分体况评分：1至3偏瘦、4至5理想、6至7超重、8至9肥胖；需要观察并触摸肋骨、腰线和腹部。",
+      "safety": "用户自评仅用于筛查，兽医确认优先。",
+      "source_ids": ["SRC-WSAVA-BCS", "SRC-AAHA-NUTRITION-2021"]
+    },
+    {
+      "id": "KB-WEIGHT-007",
+      "topic": "weight_gain",
+      "title": "持续增重",
+      "question_examples": ["猫最近一直长胖怎么办", "一个月胖了很多正常吗", "为什么最近变重"],
+      "required_fields": ["weight_30d_change_g", "weight_30d_change_pct", "data_quality_score"],
+      "optional_fields": ["neuter_date", "feeding_method", "daily_food_g", "activity_level", "bcs_score"],
+      "answer_core": "先确认数据可靠，再结合总热量、零食、自由采食、绝育、活动下降和换粮等常见因素解释。",
+      "safety": "短期突然增重且无法用饮食解释，或伴随腹部、呼吸、精神异常时建议兽医评估。",
+      "source_ids": ["SRC-AAHA-OBESITY-PREVENTION", "SRC-OBESITY-RISK"]
+    },
+    {
+      "id": "KB-WEIGHT-008",
+      "topic": "weight_loss",
+      "title": "持续减重",
+      "question_examples": ["猫一直掉体重正常吗", "一个月瘦了200克要紧吗", "为什么最近越来越轻"],
+      "required_fields": ["weight_30d_change_g", "weight_30d_change_pct", "personal_baseline_g", "data_quality_score"],
+      "optional_fields": ["birth_date", "known_conditions", "appetite_change", "drinking_change", "urination_change", "vomiting", "stool_change", "activity_change"],
+      "answer_core": "先用百分比解释变化并排除设备问题，再区分计划减重与非计划减重。非计划性持续减重值得关注。",
+      "safety": "老年猫、慢病猫或伴随食欲、饮水、排尿、呕吐、排便、精神变化时建议兽医评估。",
+      "source_ids": ["SRC-CKD-WEIGHT", "SRC-AAHA-LIFESTAGE-2021"]
+    },
+    {
+      "id": "KB-WEIGHT-009",
+      "topic": "weight_loss_plan",
+      "title": "减重计划",
+      "question_examples": ["猫减肥一周掉多少合适", "猫减得太快怎么办", "能不能给猫少吃很多"],
+      "required_fields": ["personal_baseline_g", "weekly_change_rate_pct"],
+      "optional_fields": ["target_weight_g", "bcs_score", "known_conditions", "daily_food_g"],
+      "answer_core": "专业资料通常建议肥胖猫在兽医管理下每周减重约0.5%至2%，实际目标应结合疾病、BCS和肌肉状态。",
+      "safety": "不能通过断食让猫快速减重；食欲明显下降或减重过快需联系兽医。",
+      "source_ids": ["SRC-AAHA-DIABETES-DIET-2026", "SRC-OBESITY-MANAGEMENT"]
+    },
+    {
+      "id": "KB-WEIGHT-010",
+      "topic": "diet_weight",
+      "title": "饮食与体重",
+      "question_examples": ["吃干粮一定更胖吗", "自由采食好吗", "猫应该喂多少"],
+      "required_fields": ["food_type", "feeding_method", "daily_food_g"],
+      "optional_fields": ["calorie_density_kcal_100g", "treat_level", "bcs_score", "weight_30d_change_pct"],
+      "answer_core": "体重主要受总热量摄入与消耗影响，不能仅凭干粮或湿粮判断；自由采食可能让摄入量难以控制。",
+      "rules": ["没有热量密度和目标体重时，不输出精确喂食克数"],
+      "source_ids": ["SRC-AAHA-NUTRITION-2021", "SRC-AAHA-OBESITY-PREVENTION"]
+    },
+    {
+      "id": "KB-WEIGHT-011",
+      "topic": "activity_weight",
+      "title": "活动与体重",
+      "question_examples": ["猫不爱动会胖吗", "多运动能减肥吗", "活动少影响体重吗"],
+      "required_fields": ["activity_level"],
+      "optional_fields": ["bcs_score", "weight_30d_change_pct", "daily_food_g"],
+      "answer_core": "活动不足与超重风险有关；活动有助于能量消耗和维持肌肉，但体重管理通常仍需控制总热量。",
+      "source_ids": ["SRC-AAHA-OBESITY-PREVENTION"]
+    },
+    {
+      "id": "KB-WEIGHT-012",
+      "topic": "senior_weight_loss",
+      "title": "老年猫体重下降",
+      "question_examples": ["老猫越来越瘦正常吗", "十几岁的猫体重下降怎么办", "老年猫掉肌肉怎么办"],
+      "required_fields": ["birth_date", "weight_30d_change_pct", "weight_90d_change_pct", "personal_baseline_g"],
+      "optional_fields": ["bcs_score", "mcs_score", "known_conditions", "appetite_change", "drinking_change", "urination_change", "activity_change"],
+      "answer_core": "老年猫可能出现肌肉和体重下降，但持续减重不应简单归因于衰老。",
+      "safety": "尤其伴随饮水、排尿、食欲或精神变化时建议及时兽医评估。",
+      "source_ids": ["SRC-AAHA-SENIOR-2021", "SRC-CKD-WEIGHT"]
+    },
+    {
+      "id": "KB-WEIGHT-013",
+      "topic": "device_capability",
+      "title": "单传感器设备能力",
+      "question_examples": ["这个猫窝能测体脂吗", "能测出哪些健康数据", "能测睡眠吗"],
+      "required_fields": [],
+      "optional_fields": [],
+      "answer_core": "单个体重传感器可测稳定体重、体重趋势、进入次数和停留时长；不能直接测体脂、肌肉量、姿势、身份、心率、疾病或睡眠阶段。",
+      "source_ids": []
+    },
+    {
+      "id": "KB-WEIGHT-014",
+      "topic": "multi_cat",
+      "title": "多猫家庭数据归属",
+      "question_examples": ["两只猫共用能分清吗", "这条体重是谁的", "多猫家庭能用吗"],
+      "required_fields": ["household_type"],
+      "optional_fields": [],
+      "answer_core": "没有摄像头或RFID时，单个重量传感器不能可靠区分体重相近的猫。多猫记录需用户确认，一台设备绑定一只猫最可靠。",
+      "source_ids": []
+    }
+  ],
+  "sources": [
+    {"id": "SRC-AAHA-LIFESTAGE-2021", "title": "2021 AAHA/AAFP Feline Life Stage Guidelines", "type": "guideline", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10812130/"},
+    {"id": "SRC-AAHA-SENIOR-2021", "title": "2021 AAFP Feline Senior Care Guidelines", "type": "guideline", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10812122/"},
+    {"id": "SRC-AAHA-NUTRITION-2021", "title": "2021 AAHA Nutrition and Weight Management Guidelines", "type": "guideline", "url": "https://www.aaha.org/resources/2021-aaha-nutrition-and-weight-management-guidelines/"},
+    {"id": "SRC-AAHA-YOUNG-ADULT", "title": "Nutrition and Weight: Young Adult Cats", "type": "guideline", "url": "https://www.aaha.org/resources/2021-aaha-aafp-feline-life-stage-guidelines/nutrition-and-weight-young-adult-cats/"},
+    {"id": "SRC-AAHA-OBESITY-PREVENTION", "title": "Prevention of Obesity", "type": "guideline", "url": "https://www.aaha.org/resources/2021-aaha-nutrition-and-weight-management-guidelines/prevention-of-obesity/"},
+    {"id": "SRC-AAHA-DIABETES-DIET-2026", "title": "2026 AAHA Diabetes Management Guidelines for Cats: Dietary Management", "type": "guideline", "url": "https://www.aaha.org/resources/2026-aaha-diabetes-management-guidelines-for-cats/section-8-dietary-management/"},
+    {"id": "SRC-WSAVA-BCS", "title": "WSAVA Cat Body Condition Score", "type": "clinical_tool", "url": "https://wsava.org/wp-content/uploads/2020/01/Cat-Body-Condition-Scoring-2017.pdf"},
+    {"id": "SRC-WSAVA-MCS", "title": "WSAVA Muscle Condition Score for Cats", "type": "clinical_tool", "url": "https://wsava.org/wp-content/uploads/2020/01/Muscle-Condition-Score-Chart-for-Cats.pdf"},
+    {"id": "SRC-WALTHAM-GROWTH", "title": "WALTHAM Kitten Growth Charts", "type": "growth_standard", "url": "https://www.waltham.com/resources/kitten-growth-charts"},
+    {"id": "SRC-TICA-RAGDOLL", "title": "TICA Ragdoll Breed Information", "type": "breed_reference", "url": "https://tica.org/breed/ragdoll/"},
+    {"id": "SRC-TICA-BSH", "title": "TICA British Shorthair Breed Information", "type": "breed_reference", "url": "https://tica.org/breed/british-shorthair/"},
+    {"id": "SRC-TICA-SIAMESE", "title": "TICA Siamese Breed Information", "type": "breed_reference", "url": "https://tica.org/breed/siamese/"},
+    {"id": "SRC-WEIGHT-19M", "title": "Investigation of relationships between body weight and age among domestic cats stratified by breed and sex", "type": "observational_study", "url": "https://pubmed.ncbi.nlm.nih.gov/31260398/"},
+    {"id": "SRC-OBESITY-RISK", "title": "Owner and Cat-Related Risk Factors for Feline Overweight or Obesity", "type": "observational_study", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6709657/"},
+    {"id": "SRC-BCS-DISEASE", "title": "Associations of body condition score with health conditions related to overweight and obesity in cats", "type": "observational_study", "url": "https://pubmed.ncbi.nlm.nih.gov/30033652/"},
+    {"id": "SRC-CKD-WEIGHT", "title": "Evaluation of Weight Loss Over Time in Cats with Chronic Kidney Disease", "type": "observational_study", "url": "https://onlinelibrary.wiley.com/doi/10.1111/jvim.14561"},
+    {"id": "SRC-OBESITY-MANAGEMENT", "title": "Management of obesity in cats", "type": "review", "url": "https://pubmed.ncbi.nlm.nih.gov/32670850/"}
+  ],
+  "global_safety_rules": [
+    "不根据单次重量判断健康",
+    "不根据品种参考范围单独判断肥胖",
+    "不把统计相关表达为必然因果",
+    "不根据体重变化诊断具体疾病",
+    "数据不足时先追问，不输出伪精确结论",
+    "优先使用个人历史趋势",
+    "兽医确认的BCS和目标体重优先于用户自评",
+    "非计划性持续减重或伴随明显症状时建议兽医评估",
+    "不提供断食或极端限制饮食建议"
+  ],
+  "default_disclaimer": "本回答用于体重趋势和健康信息参考，不能替代兽医检查或诊断。"
+}

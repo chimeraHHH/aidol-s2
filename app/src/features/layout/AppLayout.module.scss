@@ -30,8 +30,12 @@
   overflow: auto;
   display: flex;
   flex-direction: column;
-  padding: 0 22px calc(var(--tab-height) + var(--safe-bottom) + 8px);
+  padding-top: 0;
+  padding-left: max(16px, calc(12px + env(safe-area-inset-left, 0px)));
+  padding-right: max(16px, calc(12px + env(safe-area-inset-right, 0px)));
+  padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + 8px);
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
   scrollbar-width: none;
 }
 

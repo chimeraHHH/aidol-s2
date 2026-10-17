@@ -2,6 +2,7 @@ import type { CatProfile, CompanionState, Measurement, TrendPoint } from '@/doma
 
 export interface ICatRepository {
   getProfile(): Promise<CatProfile>
+  updateProfile(patch: Partial<CatProfile>): Promise<CatProfile>
   getCompanion(): Promise<CompanionState>
   updateCompanion(patch: Partial<CompanionState>): Promise<CompanionState>
   listMeasurements(): Promise<Measurement[]>

@@ -1,7 +1,9 @@
 /** Mock lifestyle metrics for the kitten health panel (not from BLE yet). */
 
+import { getNestPresence } from './nestPresence'
+
 export interface LifestyleMetric {
-  id: 'sleep' | 'activity' | 'appetite' | 'energy'
+  id: 'nest' | 'sleep' | 'activity' | 'appetite' | 'energy'
   label: string
   value: string
   unit: string
@@ -36,11 +38,22 @@ export function buildHealthSnapshot(input: {
     else weightScore = 90
   }
 
+  const nest = getNestPresence(energy)
   const sleepHours = 14.2 + (energy % 10) * 0.05
   const activityMin = 38 + Math.round((100 - energy) * 0.12)
   const appetitePct = 88 + (weekDelta !== null && weekDelta > 0 ? 4 : -2)
 
   const lifestyle: LifestyleMetric[] = [
+    {
+      id: 'nest',
+      label: '在窝时长',
+      value: nest.todayHours.toFixed(1),
+      unit: '小时',
+      hint: nest.hint,
+      score: nest.score,
+      tone:
+        nest.score >= 84 ? 'good' : nest.score >= 74 ? 'ok' : 'watch',
+    },
     {
       id: 'sleep',
       label: '睡眠',

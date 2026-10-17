@@ -197,7 +197,17 @@
   height: 74px;
   border-radius: 50%;
   object-fit: cover;
-  object-position: 50% 28%;
+  object-position: 50% 20%;
+}
+
+/* 生成抠图：略缩小完整装入，水平居中、垂直中间偏上，避免耳朵贴边被裁 */
+.scoreAvatarCutout {
+  width: 62px;
+  height: 62px;
+  object-fit: contain;
+  object-position: center;
+  /* 右移修正抠图内容常见左偏；上移一点落在圆心偏上 */
+  transform: translate(5px, -3px);
 }
 
 .insight {
@@ -424,7 +434,7 @@
 
 .statStrip {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   margin-top: 8px;
   padding-top: 14px;
   border-top: 1px solid rgba(47, 44, 42, 0.06);

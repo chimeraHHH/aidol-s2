@@ -1,7 +1,17 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppData } from '@/app/providers/AppDataProvider'
+import { resetAvatarJobUi } from '@/services/avatarGenerateJob'
+import { useAvatarGenerateJob } from './useAvatarGenerateJob'
+import { useCustomCatAvatar } from './useCustomCatAvatar'
+import {
+  formatUserLabel,
+  maskPhone,
+  useUserAccount,
+} from './useUserAccount'
 import styles from './SettingsPage.module.scss'
+
+const DEFAULT_SCENE_POSTER = '/images/companion/companion-scene-poster.jpg?v=2'
 
 function calcAgeText(birthday: string | undefined): string {
   if (!birthday) return '未设置'
@@ -22,16 +32,32 @@ function calcAgeText(birthday: string | undefined): string {
 export function SettingsPage() {
   const navigate = useNavigate()
   const { profile, device, companion, measurements, connectDevice } = useAppData()
-  const [deltaFirst, setDeltaFirst] = useState(true)
-  const [localPrivacy, setLocalPrivacy] = useState(true)
+  const { avatar: customAvatar, clear: clearAvatar } = useCustomCatAvatar()
+  const { job, generating, start: startGenerateJob } = useAvatarGenerateJob()
+  const { account, patch: patchAccount } = useUserAccount()
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+  const galleryInputRef = useRef<HTMLInputElement>(null)
   const [connecting, setConnecting] = useState(false)
-
   const name = profile?.name ?? '咪酱'
   const breed = profile?.breed ?? '英短蓝猫'
   const birthday = profile?.birthday ?? '—'
   const ageText = calcAgeText(profile?.birthday)
+  const personaLabel =
+    companion?.personaId === 'sassy'
+      ? '傲娇吐槽'
+      : companion?.personaId === 'cool'
+        ? '冷静管家'
+        : '温柔陪聊'
   const latest = measurements[0] ?? null
   const connected = device?.connection === 'connected'
+  const hasGeneratedAvatar = Boolean(customAvatar?.cutoutUrl || customAvatar?.imageUrl)
+  const displayAvatar = hasGeneratedAvatar
+    ? customAvatar!.cutoutUrl || customAvatar!.imageUrl!
+    : '/images/paimomo/cat-avatar.jpg'
+  const previewUrl = job.previewUrl || customAvatar?.imageUrl || null
+  const genTip = job.tip
+  const genError = job.error
+  const userLabel = formatUserLabel(account)
 
   const bondHint = useMemo(() => {
     const bond = companion?.bond ?? 80
@@ -46,6 +72,14 @@ export function SettingsPage() {
       await connectDevice()
     } finally {
       setConnecting(false)
+    }
+  }
+
+  const onPickPhoto = (file: File | undefined) => {
+    if (!file) return
+    const started = startGenerateJob(file)
+    if (!started) {
+      /* 已有任务在后台跑 */
     }
   }
 
@@ -67,8 +101,8 @@ export function SettingsPage() {
         <div className={styles.profileBlock}>
           <div className={styles.identity}>
             <img
-              className={styles.avatar}
-              src="/images/paimomo/cat-avatar.jpg"
+              className={`${styles.avatar}${hasGeneratedAvatar ? ` ${styles.avatarCutout}` : ''}`}
+              src={displayAvatar}
               alt=""
               draggable={false}
             />
@@ -110,6 +144,85 @@ export function SettingsPage() {
             </div>
           </div>
         </div>
+      </section>
+
+      <section className={styles.card} aria-label="生成我的猫形象">
+        <div className={styles.cardHead}>
+          <h3>我的猫形象</h3>
+          {customAvatar ? (
+            <span className={styles.statusOn}>{customAvatar.mock ? 'Mock' : '已生成'}</span>
+          ) : (
+            <span className={styles.statusOn}>默认场景</span>
+          )}
+        </div>
+        <div className={styles.avatarPreviewRow}>
+          <div className={styles.avatarPreview}>
+            <img
+              src={customAvatar?.imageUrl || previewUrl || DEFAULT_SCENE_POSTER}
+              alt="猫形象预览"
+              draggable={false}
+            />
+          </div>
+          <div className={styles.avatarActions}>
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className={styles.hiddenFile}
+              onChange={(e) => {
+                void onPickPhoto(e.target.files?.[0])
+                e.target.value = ''
+              }}
+            />
+            <input
+              ref={galleryInputRef}
+              type="file"
+              accept="image/*"
+              className={styles.hiddenFile}
+              onChange={(e) => {
+                void onPickPhoto(e.target.files?.[0])
+                e.target.value = ''
+              }}
+            />
+            <button
+              type="button"
+              className={styles.btnPrimary}
+              disabled={generating}
+              onClick={() => cameraInputRef.current?.click()}
+            >
+              {generating ? '生成中…' : '拍照生成场景'}
+            </button>
+            <button
+              type="button"
+              className={styles.btnGhost}
+              disabled={generating}
+              onClick={() => galleryInputRef.current?.click()}
+            >
+              从相册上传
+            </button>
+            {customAvatar ? (
+              <button
+                type="button"
+                className={styles.btnGhost}
+                disabled={generating}
+                onClick={() => {
+                  clearAvatar()
+                  resetAvatarJobUi()
+                }}
+              >
+                恢复默认场景
+              </button>
+            ) : null}
+          </div>
+        </div>
+        {generating ? (
+          <p className={styles.avatarStatus}>
+            后台生成中：合成静帧 → 原片视频 → 无缝循环。可切换到其他页面，完成后自动替换各页头像。
+          </p>
+        ) : null}
+        {genTip && !generating ? <p className={styles.avatarTip}>{genTip}</p> : null}
+        {genError ? <p className={styles.avatarError}>{genError}</p> : null}
       </section>
 
       <section className={styles.card} aria-label="设备">
@@ -159,38 +272,73 @@ export function SettingsPage() {
         <button
           type="button"
           className={styles.toggleRow}
-          onClick={() => setDeltaFirst((v) => !v)}
-          aria-pressed={deltaFirst}
+          onClick={() => patchAccount({ deltaFirst: !account.deltaFirst })}
+          aria-pressed={account.deltaFirst}
         >
           <div>
             <span className={styles.rowLabel}>差值优先展示</span>
             <span className={styles.rowHint}>健康页优先看涨跌，而不是绝对值</span>
           </div>
-          <span className={`${styles.switch}${deltaFirst ? ` ${styles.switchOn}` : ''}`} />
+          <span className={`${styles.switch}${account.deltaFirst ? ` ${styles.switchOn}` : ''}`} />
         </button>
         <button
           type="button"
           className={styles.toggleRow}
-          onClick={() => setLocalPrivacy((v) => !v)}
-          aria-pressed={localPrivacy}
+          onClick={() => patchAccount({ localPrivacy: !account.localPrivacy })}
+          aria-pressed={account.localPrivacy}
         >
           <div>
             <span className={styles.rowLabel}>本地优先 · 不朗读体重</span>
             <span className={styles.rowHint}>数据留在本机，语音不报具体公斤数</span>
           </div>
-          <span className={`${styles.switch}${localPrivacy ? ` ${styles.switchOn}` : ''}`} />
+          <span className={`${styles.switch}${account.localPrivacy ? ` ${styles.switchOn}` : ''}`} />
+        </button>
+      </section>
+
+      <section className={styles.card} aria-label="设置">
+        <h3 className={styles.cardTitle}>设置</h3>
+        <button
+          type="button"
+          className={styles.navRow}
+          onClick={() => navigate('/settings/account')}
+        >
+          <div>
+            <span className={styles.rowLabel}>账号与登录</span>
+            <span className={styles.rowHint}>
+              {account.displayName || userLabel} · {maskPhone(account.phone)} · 详情 / 退出
+            </span>
+          </div>
+          <span className={styles.rowChevron} aria-hidden>
+            ›
+          </span>
         </button>
       </section>
 
       <section className={styles.card} aria-label="关于">
-        <h3 className={styles.cardTitle}>关于小咪</h3>
+        <h3 className={styles.cardTitle}>关于窝知</h3>
         <div className={styles.aboutRow}>
           <span>版本</span>
           <span>1.0.0</span>
         </div>
         <div className={styles.aboutRow}>
           <span>账号</span>
-          <span>用户08645</span>
+          <span>{userLabel}</span>
+        </div>
+        <div className={styles.aboutRow}>
+          <span>昵称</span>
+          <span>{account.displayName || '—'}</span>
+        </div>
+        <div className={styles.aboutRow}>
+          <span>猫怎么叫我</span>
+          <span>{account.callAs || account.displayName || '—'}</span>
+        </div>
+        <div className={styles.aboutRow}>
+          <span>猫猫人设</span>
+          <span>{personaLabel}</span>
+        </div>
+        <div className={styles.aboutRow}>
+          <span>猫猫名</span>
+          <span>{name}</span>
         </div>
       </section>
     </div>

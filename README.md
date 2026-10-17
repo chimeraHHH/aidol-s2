@@ -71,7 +71,7 @@
 | 模块 | 能力要点 |
 |------|----------|
 | **首页** | 宠窝主页、通知 / 搜索 / 发帖入口、宠物状态 |
-| **陪伴** | 与小咪对话（规则回复 Mock）、TTS 标记、场景氛围 |
+| **陪伴** | 与小咪对话（健康 Agent + 方舟大模型 / Mock）、Memory、TTS 标记、场景氛围 |
 | **健康** | 体重序列图、日/月/年切换、生活方式指标、称重入口 |
 | **发现** | 社区帖、知识卡片、用户头像墙 |
 | **我的** | 档案、亲密度、设备连接、隐私 / 展示偏好 |
@@ -136,17 +136,29 @@
 
 ### 安装与开发
 
+需要同时启动 **前端** 与 **后端**（形象生成 / 大模型接口）。
+
 ```bash
 git clone https://github.com/chimeraHHH/aidol-s2.git
-cd aidol-s2/app
+cd aidol-s2
 
+# 后端（默认 :8787）
+cd server
+cp .env.example .env   # 填入 ARK_API_KEY；可先空着走 Mock
+npm install
+npm run dev
+
+# 另开终端：前端（默认 :5173，已代理 /api → 8787）
+cd ../app
 npm install --legacy-peer-deps
 npm run dev
 ```
 
-浏览器打开终端提示地址（默认 `http://localhost:5173`）。
+浏览器打开终端提示地址（默认 `http://localhost:5173`）。  
+在 **我的 → 我的猫形象** 可拍照/上传，调用后端 Seedream 生成 3D 形象并应用到陪伴页。
 
-> 使用 `--legacy-peer-deps` 是为了兼容当前依赖解析；请保留此参数。
+> 使用 `--legacy-peer-deps` 是为了兼容当前依赖解析；请保留此参数。  
+> 说明：口语「Seedance」在方舟为视频模型；静态 3D 猫形象走 **Seedream** 图生图，Seedance / 对话接口已在 `server` 预留。
 
 ### 脚本
 
@@ -186,6 +198,7 @@ aidol-s2/
 │       ├── app/                   # 壳：路由、Provider、global / tokens
 │       ├── domain/                # 领域类型
 │       ├── services/
+│       │   ├── api/               # 后端 HTTP（形象生成等）
 │       │   ├── interfaces/        # IDeviceService / ICatRepository
 │       │   ├── mock/              # Mock BLE + LocalCatRepository
 │       │   └── createServices.ts  # 组合根（换真机只改这里）
@@ -194,11 +207,15 @@ aidol-s2/
 │       │   ├── home1/             # 首页（嵌入 PaiHome）
 │       │   ├── trends/            # 健康 / 体重
 │       │   ├── discover/          # 发现
-│       │   ├── settings/          # 我的
+│       │   ├── settings/          # 我的（含拍照生成猫形象）
 │       │   ├── weigh/             # 称重流
 │       │   ├── layout/            # AppLayout + 主内容区
 │       │   └── paimomo/           # 通知 / 搜索 / 发帖 / 首页卡片等
 │       └── shared/                # PhoneShell、TabBar、StatusBar、Button…
+├── server/                        # 后端：Seedream 形象 / LLM 预留
+│   ├── src/providers/             # seedream · seedance · chat
+│   ├── src/routes/                # /api/health · /avatar · /llm
+│   └── .env.example
 ├── scripts/                       # 体重仿真等辅助脚本
 ├── _video_frames/                 # 设计参考帧（可选）
 └── generated-kittens/             # 生成素材存档（可选）
@@ -213,9 +230,10 @@ aidol-s2/
 服务层用接口隔离，方便赛后接真机 / 真后端：
 
 1. **接真实硬件**：实现 `IDeviceService`，在 `createServices.ts` 注入。  
-2. **接后端**：实现 `ICatRepository`，替换 `LocalCatRepository`。  
-3. **新页面**：在 `features/<name>` 新增，挂到 `app/router.tsx`，必要时加 Tab。  
-4. **改视觉**：优先改 `tokens.css`，避免散落魔法数。
+2. **接后端**：实现 `ICatRepository`，替换 `LocalCatRepository`；形象生成已走 `server` + `services/api/avatarApi.ts`。  
+3. **接大模型**：在 `server/src/providers` 扩展 Seedream / Seedance / Chat；陪伴对话走 `POST /api/companion/chat`（`server/agent` 人格文件 + Memory）；密钥只放 `server/.env`。  
+4. **新页面**：在 `features/<name>` 新增，挂到 `app/router.tsx`，必要时加 Tab。  
+5. **改视觉**：优先改 `tokens.css`，避免散落魔法数。
 
 ```ts
 // app/src/services/createServices.ts（示意）

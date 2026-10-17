@@ -24,6 +24,15 @@ Thumbs.db
 .env.*
 !.env.example
 
+# Backend uploads / generated avatars / agent memory
+server/uploads/
+server/generated/
+server/data/memory/
+
+# Local scratch / processing temps
+app/tmp/
+app/public/images/companion/tmp/
+
 # OS
 .AppleDouble
 .LSOverride

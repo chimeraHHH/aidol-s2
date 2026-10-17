@@ -73,9 +73,19 @@
   --phone-height: 932px;
   --phone-radius: 55px;
   --phone-bezel: 11px;
+  /* 桌面手机框：模拟 iPhone 灵动岛 + Home Indicator */
   --safe-top: 56px;
   --safe-bottom: 34px;
   --tab-height: 64px;
+  --app-vh: 100vh;
 
   color-scheme: light;
+}
+
+/* 真机全屏：吃系统安全区，避免与系统状态栏/底部横条打架 */
+html[data-shell='mobile'] {
+  --safe-top: max(20px, env(safe-area-inset-top, 0px));
+  --safe-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+  --tab-height: 58px;
+  --app-vh: 100dvh;
 }

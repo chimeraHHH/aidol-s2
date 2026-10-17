@@ -2,6 +2,16 @@ import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { useAppData } from '@/app/providers/AppDataProvider'
+import { useCustomCatAvatar } from '@/features/settings/useCustomCatAvatar'
+import {
+  formatUserLabel,
+  useUserAccount,
+} from '@/features/settings/useUserAccount'
+import {
+  formatNestDelta,
+  formatNestHours,
+  getNestPresence,
+} from '@/features/trends/nestPresence'
 import { PaiHeader } from '../components/PaiHeader'
 import styles from './PaiHomePage.module.scss'
 
@@ -37,7 +47,14 @@ function calcAgeText(birthday: string | undefined): string {
 
 export function PaiHomePage({ embed = false }: PaiHomePageProps) {
   const navigate = useNavigate()
-  const { measurements, profile } = useAppData()
+  const { measurements, profile, companion } = useAppData()
+  const { account } = useUserAccount()
+  const { avatar: customAvatar } = useCustomCatAvatar()
+  // 首页必须用透明抠图层，尺寸与默认猫层一致
+  const hasGeneratedCutout = Boolean(customAvatar?.cutoutUrl)
+  const heroCatSrc = hasGeneratedCutout
+    ? customAvatar!.cutoutUrl!
+    : '/images/companion-cat-layer.png?v=7'
   const [editor, setEditor] = useState<Editor>(null)
   const [birthday, setBirthday] = useState(profile?.birthday ?? '2025-09-17')
   const [expense, setExpense] = useState(0)
@@ -52,6 +69,13 @@ export function PaiHomePage({ embed = false }: PaiHomePageProps) {
     const h = new Date().getHours()
     return h < 11 ? '早上好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好'
   }, [])
+
+  const nest = useMemo(
+    () => getNestPresence(companion?.energy ?? 78),
+    [companion?.energy],
+  )
+  const nestText = formatNestHours(nest.todayHours)
+  const nestHint = formatNestDelta(nest.deltaHours)
 
   const latest = measurements[0] ?? null
   const weightText = latest ? latest.weightKg.toFixed(2) : '—'
@@ -262,24 +286,27 @@ export function PaiHomePage({ embed = false }: PaiHomePageProps) {
       <section className={styles.heroBlock}>
         <div className={styles.greeting}>
           <h1>
-            {greeting}，用户08645
+            {greeting}，{account.displayName || formatUserLabel(account)}
           </h1>
         </div>
 
         <div className={styles.heroCard}>
           <div className={styles.heroCopy}>
-            <div className={styles.scoreLabel}>今日体重</div>
+            <div className={styles.scoreLabel}>今日在窝时长</div>
             <div className={styles.score}>
-              {weightText}
-              {latest ? <span className={styles.scoreUnit}>kg</span> : null}
+              {nestText}
+              <span className={styles.scoreUnit}>小时</span>
             </div>
-            <div className={styles.scoreOk}>{weightHint}</div>
+            <div className={styles.scoreOk}>{nestHint}</div>
             <button type="button" className={styles.chatBtn} onClick={() => navigate('/')}>
               和我聊聊
             </button>
           </div>
-          <div className={styles.heroCatWrap} aria-hidden>
-            <img className={styles.heroCat} src="/images/companion-cat-layer.png?v=7" alt="" />
+          <div
+            className={styles.heroCatWrap}
+            aria-hidden
+          >
+            <img className={styles.heroCat} src={heroCatSrc} alt="" />
           </div>
         </div>
       </section>

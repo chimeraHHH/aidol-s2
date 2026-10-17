@@ -191,6 +191,88 @@
   color: #6b635a;
 }
 
+.nestCard {
+  margin-top: 14px;
+  padding: 14px 16px 12px;
+  border-radius: 18px;
+  text-align: left;
+  background: linear-gradient(145deg, rgba(255, 252, 248, 0.95), rgba(245, 236, 224, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 8px 18px rgba(70, 50, 30, 0.06);
+}
+
+.nestTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.nestLabel {
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: #5c534a;
+}
+
+.nestHint {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #2f8a58;
+}
+
+.nestValue {
+  margin-top: 6px;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.nestValue strong {
+  font-family: var(--xm-font-num);
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--xm-ink);
+  line-height: 1;
+}
+
+.nestValue em {
+  font-style: normal;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #8a8178;
+}
+
+.nestAvg {
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 550;
+  color: #8a8178;
+}
+
+.nestBar {
+  margin-top: 10px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(47, 44, 42, 0.08);
+  overflow: hidden;
+}
+
+.nestBar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #d4a878, #6b4235);
+}
+
+.nestCopy {
+  margin: 8px 0 0;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: #8a8178;
+}
+
 .highlights {
   margin: 12px 0 8px;
   padding: 12px 14px;

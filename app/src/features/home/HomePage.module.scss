@@ -39,10 +39,13 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* 新图垫心约 50%，无需 translateY 偏移 */
   object-position: center center;
   user-select: none;
   pointer-events: none;
+}
+
+video.bgRoom {
+  background: #1c1612;
 }
 
 .catLayer {
@@ -51,11 +54,20 @@
   /* 垫心约 50%；爪略低于几何中心，贴合透视椭圆垫的视觉落点 */
   top: 50%;
   z-index: 1;
-  width: min(38vw, 168px);
+  width: min(42vw, 186px);
   transform: translate(-52%, -80%);
   transform-origin: 50% 96%;
   pointer-events: none;
   animation: catBreath 4.2s ease-in-out infinite;
+}
+
+/* 播动画时关掉呼吸缩放，避免和视频动作打架 */
+.catLayerPlaying {
+  animation: none;
+}
+
+.catLayerPlaying .catShadow {
+  animation: none;
 }
 
 .catShadow {
@@ -147,7 +159,10 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: calc(var(--safe-top) - 4px) 14px calc(var(--tab-height) + var(--safe-bottom) + 6px);
+  padding-top: max(8px, calc(var(--safe-top) + 4px));
+  padding-left: max(12px, calc(10px + env(safe-area-inset-left, 0px)));
+  padding-right: max(12px, calc(10px + env(safe-area-inset-right, 0px)));
+  padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + 6px);
 }
 
 .chatHeader {
@@ -263,6 +278,11 @@
   gap: 6px;
 }
 
+.bubblePending {
+  opacity: 0.72;
+  font-style: italic;
+}
+
 .bubbleCat p,
 .bubbleUser p {
   margin: 0;
@@ -339,7 +359,8 @@
   background: transparent;
   color: var(--xm-ink);
   font: inherit;
-  font-size: 0.95rem;
+  /* ≥16px 避免 iOS 聚焦时强制放大页面 */
+  font-size: 16px;
   outline: none;
   min-width: 0;
 }

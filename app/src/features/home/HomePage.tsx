@@ -1,34 +1,28 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useAppData } from '@/app/providers/AppDataProvider'
+import { useCustomCatAvatar } from '@/features/settings/useCustomCatAvatar'
+import { useCompanionChat } from './useCompanionChat'
 import styles from './HomePage.module.scss'
 
-type Msg = {
-  id: string
-  role: 'cat' | 'user'
-  text: string
-  tts?: boolean
-}
-
-const CAT_REPLIES = [
-  '喵呜……我在听呢，慢慢说。',
-  '听起来你今天很认真呀，我用尾巴卷住你的手指。',
-  '如果累了，就先摸摸我的头，我陪你待一会儿。',
-  '外面怎样都好，你回来我就开心。',
-  '呼噜呼噜……你的声音让我想眯一会儿眼。',
-  '那我们一起数三下呼吸？吸——呼——我在这儿。',
-]
+/** 全景场景视频（房间 + 垫子上的猫），进入陪伴页循环播放 */
+const SCENE_VIDEO_SRC = '/images/companion/companion-scene.mp4?v=2'
+const SCENE_POSTER_SRC = '/images/companion/companion-scene-poster.jpg?v=2'
 
 export function HomePage() {
+  const { profile } = useAppData()
+  const { avatar: customAvatar } = useCustomCatAvatar()
+  const { msgs, sending, lastReaction, send } = useCompanionChat()
+  const catLabel = profile?.name?.trim() || '小咪'
   const [draft, setDraft] = useState('')
-  const [msgs, setMsgs] = useState<Msg[]>([
-    {
-      id: 'm0',
-      role: 'cat',
-      text: 'Hi，我是小咪。想晒太阳、撒娇，还是听你讲今天的事？',
-      tts: true,
-    },
-  ])
   const listRef = useRef<HTMLDivElement>(null)
-  const replyIdx = useRef(0)
+  const sceneVideoRef = useRef<HTMLVideoElement>(null)
+  /** 有自定义无缝视频 → 全景视频；仅有静帧 → 全景静帧铺满；否则默认官方视频 */
+  const customVideoUrl = customAvatar?.videoUrl
+  const customSceneStill = customAvatar?.imageUrl
+  const useCustomStillOnly = Boolean(customSceneStill && !customVideoUrl)
+  const sceneVideoSrc = customVideoUrl || SCENE_VIDEO_SRC
+  const scenePosterSrc = customSceneStill || SCENE_POSTER_SRC
+  const faceSrc = customAvatar?.cutoutUrl || customSceneStill || '/images/paimomo/cat-avatar.jpg'
 
   useEffect(() => {
     const el = listRef.current
@@ -36,43 +30,75 @@ export function HomePage() {
     el.scrollTop = el.scrollHeight
   }, [msgs])
 
-  const send = (text: string) => {
-    const trimmed = text.trim()
-    if (!trimmed) return
-    const userMsg: Msg = { id: `u-${Date.now()}`, role: 'user', text: trimmed }
-    setMsgs((prev) => [...prev, userMsg])
-    setDraft('')
-    window.setTimeout(() => {
-      const reply = CAT_REPLIES[replyIdx.current % CAT_REPLIES.length]
-      replyIdx.current += 1
-      setMsgs((prev) => [
-        ...prev,
-        { id: `c-${Date.now()}`, role: 'cat', text: reply, tts: true },
-      ])
-    }, 700 + Math.random() * 500)
-  }
+  useEffect(() => {
+    if (useCustomStillOnly) return
+
+    const startPlay = () => {
+      const v = sceneVideoRef.current
+      if (!v) return
+      try {
+        v.pause()
+        v.currentTime = 0
+        void v.play()
+      } catch {
+        /* autoplay may be blocked; poster still shows */
+      }
+    }
+
+    startPlay()
+    window.addEventListener('xm:companion-play', startPlay)
+    return () => window.removeEventListener('xm:companion-play', startPlay)
+  }, [useCustomStillOnly, sceneVideoSrc])
+
+  // 收到反应时轻震一下场景感（可选）
+  useEffect(() => {
+    if (!lastReaction) return
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate?.(lastReaction === 'nuzzle' ? [8, 40, 8] : 10)
+    }
+  }, [lastReaction])
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault()
-    send(draft)
+    const text = draft
+    setDraft('')
+    void send(text)
   }
 
   return (
-    <div className={`${styles.page} ${styles.pageChat}`}>
+    <div className={`${styles.page} ${styles.pageChat}`} data-reaction={lastReaction || undefined}>
       <div className={styles.scene} aria-hidden>
-        <img className={styles.bgRoom} src="/images/home-room.jpg?v=8" alt="" draggable={false} />
-        <div className={styles.catLayer}>
-          <span className={styles.catShadow} />
-          <img className={styles.catImg} src="/images/companion-cat-layer.png?v=7" alt="" draggable={false} />
-        </div>
+        {useCustomStillOnly ? (
+          <img
+            className={styles.bgRoom}
+            src={customSceneStill!}
+            alt=""
+            draggable={false}
+          />
+        ) : (
+          <video
+            key={sceneVideoSrc}
+            ref={sceneVideoRef}
+            className={styles.bgRoom}
+            poster={scenePosterSrc}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            aria-label={`${catLabel}在家`}
+          >
+            <source src={sceneVideoSrc} type="video/mp4" />
+          </video>
+        )}
       </div>
       <div className={styles.veilBottom} aria-hidden />
 
       <div className={styles.chat}>
         <header className={styles.chatHeader}>
           <div className={styles.brandPill}>
-            <img src="/images/paimomo/cat-avatar.jpg" alt="" />
-            <span>小咪</span>
+            <img src={faceSrc} alt="" />
+            <span>{catLabel}</span>
           </div>
           <button type="button" className={styles.callBtn} aria-label="语音陪伴">
             <PhoneIcon />
@@ -86,9 +112,9 @@ export function HomePage() {
           {msgs.map((m) =>
             m.role === 'cat' ? (
               <div key={m.id} className={styles.rowCat}>
-                <div className={styles.bubbleCat}>
-                  <p>{m.text}</p>
-                  {m.tts && (
+                <div className={`${styles.bubbleCat}${m.pending ? ` ${styles.bubblePending}` : ''}`}>
+                  <p>{m.text}{m.pending ? '…' : ''}</p>
+                  {m.tts && !m.pending && (
                     <button type="button" className={styles.tts} aria-label="播放">
                       <SpeakerIcon />
                     </button>
@@ -112,15 +138,16 @@ export function HomePage() {
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder="和我聊聊..."
+            placeholder={sending ? `${catLabel}正在想…` : '和我聊聊...'}
             enterKeyHint="send"
+            disabled={sending}
           />
-          {draft.trim() ? (
+          {draft.trim() && !sending ? (
             <button type="submit" className={styles.send} aria-label="发送">
               ↑
             </button>
           ) : (
-            <button type="button" className={styles.mic} aria-label="语音输入">
+            <button type="button" className={styles.mic} aria-label="语音输入" disabled={sending}>
               <MicIcon />
             </button>
           )}

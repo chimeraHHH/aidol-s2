@@ -60,6 +60,19 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     void refresh()
   }, [refresh])
 
+  // 切换账号后重新拉取该用户独立档案 / 测量 / 陪伴状态
+  useEffect(() => {
+    const onAccount = () => {
+      void refresh()
+    }
+    window.addEventListener('xm:user-account-changed', onAccount)
+    window.addEventListener('xm:workspace-migrated', onAccount)
+    return () => {
+      window.removeEventListener('xm:user-account-changed', onAccount)
+      window.removeEventListener('xm:workspace-migrated', onAccount)
+    }
+  }, [refresh])
+
   const setCompanion = useCallback(
     async (patch: Partial<CompanionState>) => {
       const next = await cat.updateCompanion(patch)

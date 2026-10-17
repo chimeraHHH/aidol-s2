@@ -1,18 +1,36 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useId, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppData } from '@/app/providers/AppDataProvider'
+import { useCustomCatAvatar } from '@/features/settings/useCustomCatAvatar'
 import { PERSONA_LINES } from '@/services/mock/seed'
 import styles from './CompanionPage.module.scss'
 
 const DEFAULT_LINE = '数字只是记录，我们看长期趋势。'
+const CAT_ANIM_SRC = '/images/companion/mijiang-nest-greenscreen.webp'
+const CAT_POSTER_SRC = '/images/companion/mijiang-nest-greenscreen-poster.png'
+const CAT_ANIM_MS = 10_000
 
 export function CompanionPage() {
   const navigate = useNavigate()
   const { companion } = useAppData()
+  const { avatar: customAvatar } = useCustomCatAvatar()
   const persona = companion?.personaId ?? 'gentle'
   const [line, setLine] = useState(DEFAULT_LINE)
   const [lineIndex, setLineIndex] = useState(0)
   const [quiet, setQuiet] = useState(false)
+  const animSession = useId()
+  const [catPlaying, setCatPlaying] = useState(true)
+  const customStill = customAvatar?.cutoutUrl || customAvatar?.imageUrl
+
+  useEffect(() => {
+    if (customStill) {
+      setCatPlaying(false)
+      return
+    }
+    setCatPlaying(true)
+    const id = window.setTimeout(() => setCatPlaying(false), CAT_ANIM_MS)
+    return () => window.clearTimeout(id)
+  }, [customStill])
 
   const chatAWhile = () => {
     if (quiet) {
@@ -44,18 +62,19 @@ export function CompanionPage() {
         </div>
 
         <div className={styles.mascot}>
-          <video
+          <img
             className={styles.mascotImg}
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster="/images/companion/mijiang-lick-paw-poster.jpg"
-            aria-label="咪酱舔爪子"
-          >
-            <source src="/images/companion/mijiang-lick-paw.webm" type="video/webm" />
-            <source src="/images/companion/mijiang-lick-paw.mp4" type="video/mp4" />
-          </video>
+            src={
+              customStill
+                ? customStill
+                : catPlaying
+                  ? `${CAT_ANIM_SRC}?play=${encodeURIComponent(animSession)}`
+                  : CAT_POSTER_SRC
+            }
+            alt=""
+            draggable={false}
+            aria-label="咪酱"
+          />
         </div>
       </section>
 
