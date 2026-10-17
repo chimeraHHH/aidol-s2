@@ -12,7 +12,8 @@ import {
   toTrendPoints,
 } from '@/services/mock/seed'
 
-const KEY = 'xiaomi.cat.store.v1'
+/** Bump when seed shape changes so local demos pick up Excel sim history. */
+const KEY = 'xiaomi.cat.store.v3'
 
 interface StoreShape {
   profile: CatProfile

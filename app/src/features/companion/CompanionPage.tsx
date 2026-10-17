@@ -44,12 +44,18 @@ export function CompanionPage() {
         </div>
 
         <div className={styles.mascot}>
-          <img
+          <video
             className={styles.mascotImg}
-            src="/images/companion-kitten.jpg"
-            alt="抱着爱心的小咪"
-            draggable={false}
-          />
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster="/images/companion/mijiang-lick-paw-poster.jpg"
+            aria-label="咪酱舔爪子"
+          >
+            <source src="/images/companion/mijiang-lick-paw.webm" type="video/webm" />
+            <source src="/images/companion/mijiang-lick-paw.mp4" type="video/mp4" />
+          </video>
         </div>
       </section>
 

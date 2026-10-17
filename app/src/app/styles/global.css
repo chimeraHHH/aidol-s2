@@ -16,7 +16,7 @@ body,
 body {
   font-family: var(--xm-font-body);
   color: var(--xm-ink);
-  background: var(--xm-cream-100);
+  background: var(--xm-bg);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow: hidden;
@@ -46,7 +46,7 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--xm-amber);
+  outline: 2px solid var(--xm-brown);
   outline-offset: 2px;
 }
 
@@ -56,8 +56,9 @@ button {
   place-items: center;
   padding: 32px 20px;
   background:
-    radial-gradient(ellipse 80% 55% at 50% 0%, rgba(196, 165, 116, 0.18), transparent 55%),
-    linear-gradient(165deg, #f7f2ea 0%, #efe8dc 50%, #e8dfd0 100%);
+    radial-gradient(ellipse 70% 50% at 80% 0%, rgba(196, 138, 90, 0.2), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 10% 30%, rgba(107, 66, 53, 0.08), transparent 50%),
+    linear-gradient(165deg, #f8f6f3 0%, #efece8 48%, #e5e1db 100%);
   position: relative;
   overflow: auto;
 }

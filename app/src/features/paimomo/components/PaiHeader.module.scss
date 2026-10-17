@@ -1,36 +1,48 @@
 .header {
   display: grid;
-  grid-template-columns: 44px 1fr auto;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 10px;
-  padding: calc(var(--safe-top) + 8px) 18px 10px;
+  padding: calc(var(--safe-top) - 2px) 16px 6px;
   position: relative;
   z-index: 5;
 }
 
-.avatarBtn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  overflow: hidden;
-  padding: 0;
-  border: 2px solid #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+.headerBrand {
+  padding-bottom: 10px;
 }
 
-.avatar {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.brand {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brandTitle {
+  font-family: var(--xm-font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--xm-ink);
+  line-height: 1.1;
+}
+
+.brandSub {
+  font-size: 0.72rem;
+  color: var(--xm-ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .toast {
-  justify-self: center;
+  justify-self: start;
   padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
+  border-radius: var(--xm-radius-pill);
+  background: rgba(255, 255, 255, 0.8);
   font-size: 0.72rem;
-  color: #4a433c;
+  color: var(--xm-ink-soft);
 }
 
 .actions {
@@ -39,17 +51,41 @@
 }
 
 .round {
+  position: relative;
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  background: var(--xm-surface);
+  box-shadow: var(--xm-shadow-card);
   display: grid;
   place-items: center;
-  color: #3a342e;
+  color: var(--xm-ink);
+  transition: transform 0.15s ease;
+}
+
+.round:active {
+  transform: scale(0.96);
 }
 
 .round svg {
   width: 18px;
   height: 18px;
+}
+
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--xm-danger);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--xm-surface-strong);
+  pointer-events: none;
 }

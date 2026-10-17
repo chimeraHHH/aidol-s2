@@ -4,11 +4,26 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: var(--xm-cream-100);
-  /* 全屏：内容顶到最上沿，StatusBar 透明叠在上面 */
+  background-color: var(--xm-bg);
+  background-image: var(--xm-bg-atmosphere);
+  background-attachment: local;
+  isolation: isolate;
+}
+
+/* 极轻纸纹（固定层，不抢文档流） */
+.grain {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
 }
 
 .main {
+  position: relative;
+  z-index: 1;
   flex: 1;
   min-height: 0;
   overflow: auto;
@@ -17,6 +32,11 @@
   padding: 0 22px calc(var(--tab-height) + var(--safe-bottom) + 8px);
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+}
+
+.mainBleed {
+  padding: 0;
+  overflow: hidden;
 }
 
 .main::-webkit-scrollbar {

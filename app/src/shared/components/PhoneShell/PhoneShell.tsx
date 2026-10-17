@@ -9,7 +9,7 @@ interface PhoneShellProps {
 export function PhoneShell({ children, framed }: PhoneShellProps) {
   if (!framed) {
     return (
-      <div className={styles.bleed}>
+      <div className={styles.bleed} data-phone-screen>
         <div className={styles.content}>{children}</div>
       </div>
     )
@@ -21,7 +21,7 @@ export function PhoneShell({ children, framed }: PhoneShellProps) {
       <span className={`${styles.sideButton} ${styles.sideButtonVolUp}`} />
       <span className={`${styles.sideButton} ${styles.sideButtonVolDown}`} />
       <span className={`${styles.sideButton} ${styles.sideButtonPower}`} />
-      <div className={styles.screen}>
+      <div className={styles.screen} data-phone-screen>
         <div className={styles.island} aria-hidden>
           <span className={styles.islandLens} />
         </div>

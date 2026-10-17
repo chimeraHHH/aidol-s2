@@ -5,6 +5,7 @@ import type {
   Measurement,
   TrendPoint,
 } from '@/domain/types'
+import { SIM_MEASUREMENTS } from '@/features/trends/data/kittenSim'
 
 export const SEED_PROFILE: CatProfile = {
   id: 'cat-mimi',
@@ -33,28 +34,8 @@ export const SEED_DEVICE: DeviceInfo = {
   lastSeenAt: new Date().toISOString(),
 }
 
-const today = new Date()
-
-function daysAgo(n: number): string {
-  const d = new Date(today)
-  d.setDate(d.getDate() - n)
-  return d.toISOString()
-}
-
-/** Synthetic but realistic cat weight series (~4.2–4.6 kg). */
-export const SEED_MEASUREMENTS: Measurement[] = [
-  { sessionId: 's12', weightKg: 4.42, deltaKg: -0.03, lockedAt: daysAgo(0), source: 'mock' },
-  { sessionId: 's11', weightKg: 4.45, deltaKg: 0.02, lockedAt: daysAgo(1), source: 'mock' },
-  { sessionId: 's10', weightKg: 4.43, deltaKg: -0.05, lockedAt: daysAgo(2), source: 'mock' },
-  { sessionId: 's09', weightKg: 4.48, deltaKg: 0.04, lockedAt: daysAgo(3), source: 'mock' },
-  { sessionId: 's08', weightKg: 4.44, deltaKg: -0.01, lockedAt: daysAgo(4), source: 'mock' },
-  { sessionId: 's07', weightKg: 4.45, deltaKg: 0.06, lockedAt: daysAgo(5), source: 'mock' },
-  { sessionId: 's06', weightKg: 4.39, deltaKg: -0.02, lockedAt: daysAgo(6), source: 'mock' },
-  { sessionId: 's05', weightKg: 4.41, deltaKg: 0.01, lockedAt: daysAgo(8), source: 'mock' },
-  { sessionId: 's04', weightKg: 4.4, deltaKg: -0.04, lockedAt: daysAgo(9), source: 'mock' },
-  { sessionId: 's03', weightKg: 4.44, deltaKg: 0.03, lockedAt: daysAgo(11), source: 'mock' },
-  { sessionId: 's02', weightKg: 4.41, deltaKg: null, lockedAt: daysAgo(13), source: 'mock' },
-]
+/** From Excel sim (`public/data/kitten-weight-sim.xlsx` → JSON). Newest first. */
+export const SEED_MEASUREMENTS: Measurement[] = SIM_MEASUREMENTS
 
 export function toTrendPoints(items: Measurement[]): TrendPoint[] {
   return [...items]

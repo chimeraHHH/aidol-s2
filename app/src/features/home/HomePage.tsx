@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { useAppData } from '@/app/providers/AppDataProvider'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import styles from './HomePage.module.scss'
 
 type Msg = {
@@ -8,9 +7,6 @@ type Msg = {
   text: string
   tts?: boolean
 }
-
-const INTRO =
-  '喵～我是小咪。今天也想趴在你身边听你说话。心里事、开心事，都可以跟我聊聊。'
 
 const CAT_REPLIES = [
   '喵呜……我在听呢，慢慢说。',
@@ -22,10 +18,6 @@ const CAT_REPLIES = [
 ]
 
 export function HomePage() {
-  const { companion } = useAppData()
-  const { hello, sub } = useMemo(() => greetingCopy(), [])
-  const [started, setStarted] = useState(false)
-  const [playing, setPlaying] = useState(false)
   const [draft, setDraft] = useState('')
   const [msgs, setMsgs] = useState<Msg[]>([
     {
@@ -42,13 +34,7 @@ export function HomePage() {
     const el = listRef.current
     if (!el) return
     el.scrollTop = el.scrollHeight
-  }, [msgs, started])
-
-  useEffect(() => {
-    if (!playing) return
-    const id = window.setTimeout(() => setPlaying(false), 4200)
-    return () => window.clearTimeout(id)
-  }, [playing])
+  }, [msgs])
 
   const send = (text: string) => {
     const trimmed = text.trim()
@@ -72,167 +58,75 @@ export function HomePage() {
   }
 
   return (
-    <div className={`${styles.page}${started ? ` ${styles.pageChat}` : ''}`}>
-      <div className={styles.bg} aria-hidden />
-      <div className={styles.bgBreath} aria-hidden />
-      <div className={styles.sun} aria-hidden />
-      <div className={styles.veilTop} aria-hidden />
+    <div className={`${styles.page} ${styles.pageChat}`}>
+      <div className={styles.scene} aria-hidden>
+        <img className={styles.bgRoom} src="/images/home-room.jpg?v=8" alt="" draggable={false} />
+        <div className={styles.catLayer}>
+          <span className={styles.catShadow} />
+          <img className={styles.catImg} src="/images/companion-cat-layer.png?v=7" alt="" draggable={false} />
+        </div>
+      </div>
       <div className={styles.veilBottom} aria-hidden />
 
-      {!started ? (
-        <div className={styles.landing}>
-          <header className={styles.topTools}>
-            <div className={styles.toolGroup}>
-              <span className={styles.toolBtn} aria-hidden>
-                ···
-              </span>
-            </div>
-            <div className={styles.namePill}>
-              <img src="/images/companion-bg-ref.png" alt="" className={styles.pillAvatar} />
-              <div className={styles.pillCopy}>
-                <div className={styles.pillName}>
-                  小咪
-                  <span className={styles.badge}>官方认证</span>
+      <div className={styles.chat}>
+        <header className={styles.chatHeader}>
+          <div className={styles.brandPill}>
+            <img src="/images/paimomo/cat-avatar.jpg" alt="" />
+            <span>小咪</span>
+          </div>
+          <button type="button" className={styles.callBtn} aria-label="语音陪伴">
+            <PhoneIcon />
+          </button>
+        </header>
+
+        <div className={styles.msgScroll} ref={listRef}>
+          <div className={styles.stageSpacer} aria-hidden />
+          <div className={styles.time}>刚才</div>
+
+          {msgs.map((m) =>
+            m.role === 'cat' ? (
+              <div key={m.id} className={styles.rowCat}>
+                <div className={styles.bubbleCat}>
+                  <p>{m.text}</p>
+                  {m.tts && (
+                    <button type="button" className={styles.tts} aria-label="播放">
+                      <SpeakerIcon />
+                    </button>
+                  )}
                 </div>
-                <p>你的 AI 猫窝伙伴 · 随时陪聊</p>
               </div>
-            </div>
-          </header>
-
-          <div className={styles.heroCopy}>
-            <h1>{hello}</h1>
-            <p>{sub}</p>
-            {companion && companion.streakDays > 0 && (
-              <span className={styles.streak}>已连续陪伴 {companion.streakDays} 天</span>
-            )}
-          </div>
-
-          <div className={styles.landingBottom}>
-            <div className={styles.titleRow}>
-              <h2>小咪陪你聊聊</h2>
-              <span className={styles.tag}>陪伴</span>
-            </div>
-            <p className={styles.online}>
-              <i /> 随时在线 · 想说就说
-            </p>
-
-            <div className={styles.previewBubble}>
-              <div className={styles.bubbleAvatar}>
-                <img src="/images/companion-bg-ref.png" alt="" />
-                <span>AI</span>
-              </div>
-              <p>Hi，我是小咪。晒晒太阳、撒个娇，或者听你讲今天的事～</p>
-            </div>
-
-            <button type="button" className={styles.startBtn} onClick={() => setStarted(true)}>
-              <ChatIcon />
-              开始聊聊
-            </button>
-            <p className={styles.startHint}>和自己的小猫说说话</p>
-          </div>
-        </div>
-      ) : (
-        <div className={styles.chat}>
-          <header className={styles.chatHeader}>
-            <div className={styles.chatIdentity}>
-              <img src="/images/companion-bg-ref.png" alt="" />
-              <span>小咪陪你聊聊</span>
-              <SpeakerIcon />
-            </div>
-            <button type="button" className={styles.callBtn} aria-label="语音陪伴">
-              <PhoneIcon />
-            </button>
-          </header>
-
-          <div className={styles.msgScroll} ref={listRef}>
-            <article className={styles.featureCard}>
-              <p>{INTRO}</p>
-              <button
-                type="button"
-                className={`${styles.audioBar}${playing ? ` ${styles.audioPlaying}` : ''}`}
-                onClick={() => setPlaying((v) => !v)}
-              >
-                <span className={styles.play}>{playing ? '❚❚' : '▶'}</span>
-                <span className={styles.wave} aria-hidden>
-                  {Array.from({ length: 18 }).map((_, i) => (
-                    <i key={i} style={{ animationDelay: `${i * 0.05}s` }} />
-                  ))}
-                </span>
-                <span className={styles.dur}>0&apos;18&quot;</span>
-              </button>
-            </article>
-
-            <div className={styles.time}>刚才</div>
-
-            {msgs.map((m) =>
-              m.role === 'cat' ? (
-                <div key={m.id} className={styles.rowCat}>
-                  <div className={styles.bubbleAvatar}>
-                    <img src="/images/companion-bg-ref.png" alt="" />
-                    <span>AI</span>
-                  </div>
-                  <div className={styles.bubbleCat}>
-                    <p>{m.text}</p>
-                    {m.tts && (
-                      <button type="button" className={styles.tts} aria-label="播放">
-                        <SpeakerIcon />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div key={m.id} className={styles.rowUser}>
-                  <div className={styles.bubbleUser}>
-                    <p>{m.text}</p>
-                  </div>
-                </div>
-              ),
-            )}
-          </div>
-
-          <form className={styles.composer} onSubmit={onSubmit}>
-            <button type="button" className={styles.plus} aria-label="更多">
-              +
-            </button>
-            <input
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              placeholder="和我聊聊..."
-              enterKeyHint="send"
-            />
-            {draft.trim() ? (
-              <button type="submit" className={styles.send} aria-label="发送">
-                ↑
-              </button>
             ) : (
-              <button type="button" className={styles.mic} aria-label="语音输入">
-                <MicIcon />
-              </button>
-            )}
-          </form>
+              <div key={m.id} className={styles.rowUser}>
+                <div className={styles.bubbleUser}>
+                  <p>{m.text}</p>
+                </div>
+              </div>
+            ),
+          )}
         </div>
-      )}
+
+        <form className={styles.composer} onSubmit={onSubmit}>
+          <button type="button" className={styles.plus} aria-label="更多">
+            +
+          </button>
+          <input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder="和我聊聊..."
+            enterKeyHint="send"
+          />
+          {draft.trim() ? (
+            <button type="submit" className={styles.send} aria-label="发送">
+              ↑
+            </button>
+          ) : (
+            <button type="button" className={styles.mic} aria-label="语音输入">
+              <MicIcon />
+            </button>
+          )}
+        </form>
+      </div>
     </div>
-  )
-}
-
-function greetingCopy() {
-  const hour = new Date().getHours()
-  const hello =
-    hour < 11 ? '早上好' : hour < 14 ? '中午好' : hour < 18 ? '下午好' : '晚上好'
-  return { hello, sub: '今天见到你了' }
-}
-
-function ChatIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden className={styles.startIcon}>
-      <path
-        d="M5.5 16.2c0-3.6 3.1-6.5 6.5-6.5s6.5 2.9 6.5 6.5c0 1.1-.3 2.1-.9 3L19 20.5l-2.7-.9c-1 .4-2.1.6-3.3.6-3.4 0-6.5-2.8-6.5-6Z"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinejoin="round"
-      />
-    </svg>
   )
 }
 

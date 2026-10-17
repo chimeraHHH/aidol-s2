@@ -1,51 +1,68 @@
 :root {
-  /* 奶油底 · 暖石墨字 · 香槟交互色（少量使用） */
-  --xm-cream-50: #fbf8f2;
-  --xm-cream-100: #f4efe6;
-  --xm-cream-200: #ebe3d6;
-  --xm-cream-300: #ddd2c0;
-  --xm-ink: #2f2c2a;
+  /* 小咪 · 软奢宠伴：雾化渐变底 × 可可棕强调 × 大圆角 */
+  --xm-bg: #f2f0ed;
+  --xm-bg-top: #faf8f6;
+  --xm-bg-mid: #f0eeeb;
+  --xm-bg-bottom: #e8e4df;
+  /* 角落暖雾 + 纵向沉降，避免纯平灰 */
+  --xm-bg-atmosphere:
+    radial-gradient(ellipse 110% 70% at 100% -4%, rgba(196, 138, 90, 0.34), transparent 56%),
+    radial-gradient(ellipse 85% 55% at -8% 6%, rgba(107, 66, 53, 0.14), transparent 54%),
+    radial-gradient(ellipse 90% 48% at 40% 105%, rgba(232, 213, 200, 0.55), transparent 60%),
+    linear-gradient(168deg, #fcfaf8 0%, #f3f0ec 42%, #e9e4de 100%);
+  --xm-cream-50: #faf8f6;
+  --xm-cream-100: #f2f0ed;
+  --xm-cream-200: #e7e3de;
+  --xm-cream-300: #d8d2cb;
+  --xm-ink: #1f1b17;
   --xm-ink-soft: #5a554e;
-  --xm-ink-muted: #8a8378;
-  --xm-champagne: #c4a574;
-  --xm-champagne-soft: #d9c3a0;
-  --xm-champagne-deep: #a88b58;
-  --xm-champagne-glow: rgba(196, 165, 116, 0.28);
-  /* legacy aliases → champagne */
-  --xm-amber: var(--xm-champagne);
-  --xm-amber-soft: var(--xm-champagne-soft);
-  --xm-amber-glow: var(--xm-champagne-glow);
-  --xm-terracotta: var(--xm-champagne);
-  --xm-terracotta-deep: var(--xm-champagne-deep);
-  --xm-terracotta-soft: var(--xm-champagne-soft);
-  --xm-blush: #e4cfc4;
-  --xm-success: #6f8f6a;
-  --xm-danger: #b56858;
-  --xm-surface: rgba(255, 252, 247, 0.88);
-  --xm-surface-strong: #fffcf7;
-  --xm-hairline: rgba(47, 44, 42, 0.08);
+  --xm-ink-muted: #8a837c;
+  --xm-brown: #6b4235;
+  --xm-brown-deep: #5a362c;
+  --xm-brown-soft: rgba(107, 66, 53, 0.12);
+  --xm-tan: #c48a5a;
+  --xm-tan-soft: rgba(196, 138, 90, 0.16);
+  --xm-success: #3cb371;
+  --xm-danger: #e85d4c;
+  --xm-surface: rgba(255, 255, 255, 0.86);
+  --xm-surface-strong: #ffffff;
+  --xm-hairline: rgba(31, 27, 23, 0.07);
 
-  /* 测量页数字：高对比、等宽、快速扫读 */
-  --xm-num: #1a1816;
-  --xm-num-unit: #6b655c;
+  /* legacy aliases → brown system */
+  --xm-champagne: var(--xm-tan);
+  --xm-champagne-soft: #d4a878;
+  --xm-champagne-deep: var(--xm-brown);
+  --xm-champagne-glow: var(--xm-tan-soft);
+  --xm-amber: var(--xm-tan);
+  --xm-amber-soft: var(--xm-champagne-soft);
+  --xm-amber-glow: var(--xm-tan-soft);
+  --xm-terracotta: var(--xm-tan);
+  --xm-terracotta-deep: var(--xm-brown);
+  --xm-terracotta-soft: var(--xm-tan-soft);
+  --xm-blush: #e8d5c8;
+
+  /* 测量页数字 */
+  --xm-num: #1f1b17;
+  --xm-num-unit: #8a837c;
   --xm-font-num: 'Outfit', 'SF Pro Display', 'PingFang SC', sans-serif;
 
   --xm-radius-sm: 14px;
-  --xm-radius-md: 22px;
+  --xm-radius-md: 20px;
   --xm-radius-lg: 28px;
   --xm-radius-pill: 999px;
 
   --xm-font-display: 'Outfit', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
   --xm-font-body: 'Outfit', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
 
-  --xm-shadow-soft: 0 16px 40px rgba(60, 48, 30, 0.1);
-  --xm-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  --xm-shadow-soft: 0 12px 32px rgba(60, 45, 30, 0.08);
+  --xm-shadow-card: 0 8px 24px rgba(60, 45, 30, 0.06);
+  --xm-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 
   --phone-width: 430px;
   --phone-height: 932px;
   --phone-radius: 55px;
   --phone-bezel: 11px;
-  --safe-top: 54px;
+  --safe-top: 48px;
   --safe-bottom: 34px;
   --tab-height: 64px;
 

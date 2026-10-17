@@ -1,0 +1,153 @@
+.page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #f3f1ec;
+  padding: calc(var(--safe-top) + 8px) 0 24px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 14px 12px;
+}
+
+.back {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: #2a241f;
+  box-shadow: 0 4px 12px rgba(60, 40, 20, 0.06);
+}
+
+.searchBox {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 44px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(60, 40, 20, 0.05);
+  color: #8a837c;
+}
+
+.searchBox input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.95rem;
+  color: #1f1c1a;
+  outline: none;
+}
+
+.clear {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #eceae6;
+  color: #5a554e;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.idle,
+.results {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 4px 18px 20px;
+}
+
+.secHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 12px 0 10px;
+}
+
+.secHead h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #1f1c1a;
+}
+
+.secHead button {
+  font-size: 0.8rem;
+  color: #8a837c;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chips button {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #fff;
+  color: #5a554e;
+  font-size: 0.84rem;
+  box-shadow: 0 4px 12px rgba(40, 30, 20, 0.04);
+}
+
+.resultMeta {
+  margin: 4px 0 12px;
+  font-size: 0.82rem;
+  color: #8a837c;
+}
+
+.resultCard {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(40, 30, 20, 0.04);
+}
+
+.resultCard img {
+  width: 84px;
+  height: 84px;
+  border-radius: 14px;
+  object-fit: cover;
+  background: #eceae6;
+}
+
+.resultCard span {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #6b4235;
+  background: #f0e6dc;
+  padding: 2px 7px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+}
+
+.resultCard h3 {
+  margin: 0 0 4px;
+  font-size: 0.92rem;
+  line-height: 1.35;
+  color: #1f1c1a;
+}
+
+.resultCard p {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #8a837c;
+}

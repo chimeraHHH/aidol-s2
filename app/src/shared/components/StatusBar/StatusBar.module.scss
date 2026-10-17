@@ -4,93 +4,64 @@
   left: 0;
   right: 0;
   height: var(--safe-top);
-  padding: 14px 22px 0;
+  padding: 11px 20px 0;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  font-size: 0.78rem;
+  font-family: 'SF Pro Text', 'SF Pro Display', 'PingFang SC', system-ui, sans-serif;
+  font-size: 0.82rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
   color: var(--xm-ink);
   background: transparent;
   pointer-events: none;
   z-index: 50;
 }
 
+.left {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 72px;
+}
+
 .time {
-  min-width: 54px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.silent {
+  width: 13px;
+  height: 13px;
+  display: block;
+  color: var(--xm-ink);
 }
 
 .icons {
   display: flex;
   align-items: center;
-  gap: 6px;
-  min-width: 54px;
+  gap: 5px;
+  min-width: 78px;
   justify-content: flex-end;
-}
-
-.signal,
-.wifi,
-.battery {
-  display: inline-block;
-  height: 11px;
-  border-radius: 2px;
-  background: var(--xm-ink);
+  color: var(--xm-ink);
 }
 
 .signal {
   width: 17px;
-  clip-path: polygon(0 70%, 25% 70%, 25% 45%, 50% 45%, 50% 25%, 75% 25%, 75% 0, 100% 0, 100% 100%, 0 100%);
-}
-
-.wifi {
-  width: 15px;
   height: 11px;
-  border-radius: 0;
-  background: transparent;
-  border: 1.5px solid var(--xm-ink);
-  border-top: none;
-  border-radius: 0 0 10px 10px;
-  position: relative;
+  display: block;
 }
 
-.wifi::after {
-  content: '';
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--xm-ink);
-  left: 50%;
-  bottom: 1px;
-  transform: translateX(-50%);
+.network {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  margin-top: 0.5px;
 }
 
 .battery {
-  width: 24px;
-  height: 11px;
-  border: 1.5px solid var(--xm-ink);
-  border-radius: 3px;
-  background: transparent;
-  position: relative;
-}
-
-.battery::before {
-  content: '';
-  position: absolute;
-  inset: 1.5px;
-  width: 70%;
-  background: var(--xm-ink);
-  border-radius: 1px;
-}
-
-.battery::after {
-  content: '';
-  position: absolute;
-  right: -4px;
-  top: 2.5px;
-  width: 2px;
-  height: 4px;
-  background: var(--xm-ink);
-  border-radius: 0 1px 1px 0;
+  width: 26px;
+  height: 12px;
+  display: block;
 }
