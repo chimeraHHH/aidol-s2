@@ -4,11 +4,11 @@
 > 把「称重 → 陪伴 → 健康洞察 → 社区发现」串成一条完整产品故事。
 
 <p align="center">
-  <img src="app/public/images/home-room.jpg" alt="小咪房间场景" width="260" />
+  <img src="app/public/images/home-room.jpg" alt="小咪房间场景" width="280" />
   &nbsp;
-  <img src="app/public/images/companion/mijiang-lick-paw.gif" alt="咪酱舔爪动画" width="260" />
+  <img src="app/public/images/companion/mijiang-lick-paw.gif" alt="咪酱舔爪动画" width="280" />
   &nbsp;
-  <img src="app/public/images/health/hero-kitten.jpg" alt="健康页猫咪" width="260" />
+  <img src="app/public/images/xiaomi-product.jpg" alt="体脂秤产品图" width="280" />
 </p>
 
 <p align="center">
@@ -25,7 +25,6 @@
 
 - [项目简介](#项目简介)
 - [在线演示](#在线演示)
-- [产品截图](#产品截图)
 - [功能地图](#功能地图)
 - [信息架构与路由](#信息架构与路由)
 - [设计语言](#设计语言)
@@ -66,82 +65,6 @@
 | 源码 | https://github.com/chimeraHHH/aidol-s2 |
 
 建议用手机浏览器打开，或桌面端拉窄窗口体验全屏；宽屏会看到带 Dynamic Island 的手机框。
-
----
-
-## 产品截图
-
-### 陪伴 · 和「小咪」聊天
-
-沉浸式陪伴页：房间氛围、猫咪形象、对话气泡与输入栏。  
-演示「称完体重，回家和猫咪说说话」的情感闭环。
-
-<p align="center">
-  <img src="app/public/images/companion-kitten.jpg" alt="陪伴页猫咪" width="340" />
-  &nbsp;
-  <img src="app/public/images/companion/mijiang-lick-paw-poster.jpg" alt="舔爪海报帧" width="340" />
-</p>
-
-配套动态资源：
-
-<p align="center">
-  <img src="app/public/images/companion/mijiang-lick-paw.gif" alt="咪酱舔爪 GIF" width="280" />
-</p>
-
-### 首页 · 宠窝场景
-
-首页（`/home1`）承接宠窝内容流：通知、搜索、发帖等入口，以及宠物状态卡片。
-
-<p align="center">
-  <img src="app/public/images/home-room.jpg" alt="首页房间" width="300" />
-  &nbsp;
-  <img src="app/public/images/paimomo/cat-hero.jpg" alt="宠物英雄图" width="300" />
-  &nbsp;
-  <img src="app/public/images/paimomo/cat-avatar.jpg" alt="猫咪头像" width="180" />
-</p>
-
-### 健康 · 体重趋势与生活指标
-
-健康 Tab 以体重曲线为主（日 / 月 / 年），并展示食欲、睡眠、活动等生活方式指标。
-
-<p align="center">
-  <img src="app/public/images/health/hero-kitten.jpg" alt="健康页视觉" width="300" />
-  &nbsp;
-  <img src="app/public/images/health/icon-appetite.jpg" alt="食欲" width="140" />
-  <img src="app/public/images/health/icon-sleep.jpg" alt="睡眠" width="140" />
-  <img src="app/public/images/health/icon-activity.jpg" alt="活动" width="140" />
-</p>
-
-### 发现 · 宠友内容与知识卡
-
-社区帖子 + 养护知识（饮食、梳毛、饮水、玩耍、睡眠、健康等）。
-
-<p align="center">
-  <img src="app/public/images/discover/discover-post-1.jpg" alt="发现帖 1" width="180" />
-  <img src="app/public/images/discover/discover-post-2.jpg" alt="发现帖 2" width="180" />
-  <img src="app/public/images/discover/knowledge-food.jpg" alt="饮食知识" width="180" />
-  <img src="app/public/images/discover/knowledge-groom.jpg" alt="梳毛知识" width="180" />
-</p>
-
-### 我的 · 档案与设备
-
-猫咪档案横幅、亲密度、设备连接与隐私开关，承接「硬件 + 软件」叙事。
-
-<p align="center">
-  <img src="app/public/images/settings/profile-banner.jpg" alt="我的页横幅" width="420" />
-</p>
-
-### 硬件意象 · 小米体脂秤
-
-路演时把「秤」和 App 放在同一视觉语境。
-
-<p align="center">
-  <img src="app/public/images/xiaomi-product.jpg" alt="体脂秤产品图" width="260" />
-  &nbsp;
-  <img src="app/public/images/xiaomi-exploded.jpg" alt="体脂秤爆炸图" width="260" />
-  &nbsp;
-  <img src="app/public/images/weigh-kitten-celebrate.jpg" alt="称重庆祝" width="260" />
-</p>
 
 ---
 
