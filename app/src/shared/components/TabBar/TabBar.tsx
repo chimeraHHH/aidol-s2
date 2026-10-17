@@ -2,10 +2,10 @@ import { NavLink } from 'react-router-dom'
 import styles from './TabBar.module.scss'
 
 const TABS = [
-  { to: '/', label: '首页', end: true, icon: HomeIcon },
-  { to: '/home1', label: '首页1', end: false, icon: Home1Icon },
+  { to: '/home1', label: '首页', end: false, icon: Home1Icon },
+  { to: '/', label: '陪伴', end: true, icon: CompanionIcon },
+  { to: '/discover', label: '发现', end: false, icon: DiscoverIcon },
   { to: '/trends', label: '趋势', end: false, icon: TrendsIcon },
-  { to: '/companion', label: '陪伴', end: false, icon: CompanionIcon },
   { to: '/settings', label: '我的', end: false, icon: SettingsIcon },
   // 视频 APP 入口（点进后用缦宠自己的悬浮 Tab）
   { to: '/paimomo', label: '缦宠', end: false, icon: PaiIcon },
@@ -23,7 +23,9 @@ export function TabBar() {
             className={({ isActive }) =>
               `${styles.item}${isActive ? ` ${styles.itemActive}` : ''}${
                 tab.to === '/paimomo' ? ` ${styles.paiEntry}` : ''
-              }${tab.to === '/home1' ? ` ${styles.home1Entry}` : ''}`
+              }${tab.to === '/home1' ? ` ${styles.home1Entry}` : ''}${
+                tab.to === '/discover' ? ` ${styles.discoverEntry}` : ''
+              }`
             }
           >
             <span className={styles.icon}>
@@ -37,19 +39,6 @@ export function TabBar() {
   )
 }
 
-function HomeIcon() {
-  return (
-    <svg className={styles.svg} viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
 function Home1Icon() {
   return (
     <svg className={styles.svg} viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -57,6 +46,15 @@ function Home1Icon() {
       <path d="M8 14.5c1.2 1.2 2.8 1.8 4 1.8s2.8-.6 4-1.8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       <circle cx="9.5" cy="11" r="1" fill="currentColor" />
       <circle cx="14.5" cy="11" r="1" fill="currentColor" />
+    </svg>
+  )
+}
+
+function DiscoverIcon() {
+  return (
+    <svg className={styles.svg} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.7" />
+      <path d="m14.8 9.2-1.6 5-5 1.6 1.6-5 5-1.6Z" stroke="currentColor" strokeWidth="1.5" />
     </svg>
   )
 }

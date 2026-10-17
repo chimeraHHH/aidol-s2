@@ -4,7 +4,6 @@ import styles from './PaiTabBar.module.scss'
 const TABS = [
   { to: '/paimomo', end: true, label: '宠窝', icon: HomeIcon },
   { to: '/paimomo/ai', end: false, label: 'AI', icon: AiIcon },
-  { to: '/paimomo/discover', end: false, label: '发现', icon: CompassIcon },
   { to: '/paimomo/me', end: false, label: '宠主', icon: UserIcon },
 ] as const
 
@@ -47,15 +46,6 @@ function AiIcon() {
       <text x="12" y="15.5" textAnchor="middle" fontSize="8" fontWeight="700" fill="currentColor">
         AI
       </text>
-    </svg>
-  )
-}
-
-function CompassIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden>
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.7" />
-      <path d="m14.8 9.2-1.6 5-5 1.6 1.6-5 5-1.6Z" stroke="currentColor" strokeWidth="1.5" />
     </svg>
   )
 }

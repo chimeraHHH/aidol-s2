@@ -12,7 +12,7 @@ export function PaiHeader({ onPlus, toast }: PaiHeaderProps) {
   return (
     <header className={styles.header}>
       <button type="button" className={styles.avatarBtn} onClick={() => navigate('/paimomo/me')}>
-        <img src="/images/paimomo/dog-avatar.jpg" alt="" className={styles.avatar} />
+        <img src="/images/paimomo/cat-avatar.jpg" alt="" className={styles.avatar} />
       </button>
       {toast ? <span className={styles.toast}>{toast}</span> : <span />}
       <div className={styles.actions}>

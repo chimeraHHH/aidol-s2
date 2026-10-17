@@ -13,6 +13,7 @@ export function PaiHomePage({ embed = false }: PaiHomePageProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [expenseOpen, setExpenseOpen] = useState(false)
   const [expense, setExpense] = useState(0)
+  const discoverPath = '/discover'
   const greeting = useMemo(() => {
     const h = new Date().getHours()
     return h < 11 ? '早上好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好'
@@ -28,7 +29,7 @@ export function PaiHomePage({ embed = false }: PaiHomePageProps) {
             { label: '扫码', action: () => setMenuOpen(false) },
             { label: '管理宠物档案', action: () => navigate('/paimomo/me') },
             { label: '添加好友', action: () => setMenuOpen(false) },
-            { label: '发布宠友圈', action: () => navigate('/paimomo/discover') },
+            { label: '发布宠友圈', action: () => navigate(discoverPath) },
           ].map((item) => (
             <button
               key={item.label}
@@ -86,7 +87,7 @@ export function PaiHomePage({ embed = false }: PaiHomePageProps) {
             <span className={styles.cardTitle}>健康档案</span>
             <span className={styles.arrow}>↗</span>
           </button>
-          <button type="button" className={`${styles.card} ${styles.tan}`} onClick={() => navigate('/paimomo/discover')}>
+          <button type="button" className={`${styles.card} ${styles.tan}`} onClick={() => navigate(discoverPath)}>
             <span className={styles.cardIcon}>📔</span>
             <span className={styles.cardTitle}>养宠日记</span>
             <span className={styles.arrow}>↗</span>

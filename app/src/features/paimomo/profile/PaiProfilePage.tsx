@@ -16,7 +16,7 @@ export function PaiProfilePage() {
 
       <section className={styles.card}>
         <div className={styles.avatarRing}>
-          <img className={styles.avatar} src="/images/paimomo/dog-avatar.jpg" alt="" />
+          <img className={styles.avatar} src="/images/paimomo/cat-avatar.jpg" alt="" />
         </div>
 
         <h1>用户08645</h1>
@@ -59,7 +59,7 @@ export function PaiProfilePage() {
               onClick={() => setActive('momo')}
               aria-label="选择 momo"
             />
-            <img className={styles.petThumb} src="/images/paimomo/dog-avatar.jpg" alt="" />
+            <img className={styles.petThumb} src="/images/paimomo/cat-avatar.jpg" alt="" />
             <div className={styles.petInfo}>
               <strong>momo</strong>
               <span>狗狗</span>

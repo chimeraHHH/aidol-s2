@@ -3,15 +3,14 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/features/layout/AppLayout'
 import { HomePage } from '@/features/home/HomePage'
 import { Home1Page } from '@/features/home1/Home1Page'
+import { DiscoverPage } from '@/features/discover/DiscoverPage'
 import { TrendsPage } from '@/features/trends/TrendsPage'
-import { CompanionPage } from '@/features/companion/CompanionPage'
 import { SettingsPage } from '@/features/settings/SettingsPage'
 import { WeighPage } from '@/features/weigh/WeighPage'
 import { StatusBar } from '@/shared/components/StatusBar/StatusBar'
 import { PaiLayout } from '@/features/paimomo/layout/PaiLayout'
 import { PaiHomePage } from '@/features/paimomo/home/PaiHomePage'
 import { PaiAiPage } from '@/features/paimomo/ai/PaiAiPage'
-import { PaiDiscoverPage } from '@/features/paimomo/discover/PaiDiscoverPage'
 import { PaiProfilePage } from '@/features/paimomo/profile/PaiProfilePage'
 import { PaiSplashPage } from '@/features/paimomo/splash/PaiSplashPage'
 import { PaiLoginPage } from '@/features/paimomo/login/PaiLoginPage'
@@ -38,18 +37,21 @@ export function AppRouter() {
       <Route element={<AppLayout />}>
         <Route index element={<HomePage />} />
         <Route path="home1" element={<Home1Page />} />
+        <Route path="discover" element={<DiscoverPage />} />
         <Route path="trends" element={<TrendsPage />} />
-        <Route path="companion" element={<CompanionPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
+
+      <Route path="companion" element={<Navigate to="/" replace />} />
 
       {/* 缦宠 / PaiMomo — 视频内容，独立 Tab，不改原四页 */}
       <Route path="paimomo" element={<PaiLayout />}>
         <Route index element={<PaiHomePage />} />
         <Route path="ai" element={<PaiAiPage />} />
-        <Route path="discover" element={<PaiDiscoverPage />} />
         <Route path="me" element={<PaiProfilePage />} />
       </Route>
+
+      <Route path="paimomo/discover" element={<Navigate to="/discover" replace />} />
 
       <Route path="paimomo/splash" element={<PaiFlow><PaiSplashPage /></PaiFlow>} />
       <Route path="paimomo/login" element={<PaiFlow><PaiLoginPage /></PaiFlow>} />
