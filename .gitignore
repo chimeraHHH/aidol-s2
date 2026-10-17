@@ -37,3 +37,5 @@ app/public/images/companion/tmp/
 .AppleDouble
 .LSOverride
 ._*
+.vercel
+.env*
