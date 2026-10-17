@@ -1,3 +1,20 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://aidol-s2-api.vercel.app/api/$1"
+    },
+    {
+      "source": "/generated/(.*)",
+      "destination": "https://aidol-s2-api.vercel.app/generated/$1"
+    },
+    {
+      "source": "/uploads/(.*)",
+      "destination": "https://aidol-s2-api.vercel.app/uploads/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }

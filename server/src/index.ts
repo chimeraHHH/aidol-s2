@@ -7,7 +7,12 @@ const app = createApp()
 export default app
 export { app }
 
-if (process.env.TCB_RUN !== '1' && process.env.CLOUDBASE_RUN !== '1') {
+const isManagedRuntime =
+  process.env.VERCEL === '1' ||
+  process.env.TCB_RUN === '1' ||
+  process.env.CLOUDBASE_RUN === '1'
+
+if (!isManagedRuntime) {
   app.listen(config.port, () => {
     console.log(`[xiaomi-server] http://localhost:${config.port}`)
     console.log(`[xiaomi-server] health → GET /api/health`)
