@@ -65,8 +65,13 @@ export const config = {
   chatBaseUrl: trimSlash(chatBaseUrlRaw),
   chatModel,
   allowMockAvatar: (process.env.ALLOW_MOCK_AVATAR || 'true').toLowerCase() !== 'false',
-  uploadsDir: path.join(rootDir, 'uploads'),
-  generatedDir: path.join(rootDir, 'generated'),
+  /** Vercel Serverless 仅 /tmp 可写；本地仍用仓库内目录 */
+  uploadsDir: process.env.VERCEL
+    ? path.join('/tmp', 'xiaomi-uploads')
+    : path.join(rootDir, 'uploads'),
+  generatedDir: process.env.VERCEL
+    ? path.join('/tmp', 'xiaomi-generated')
+    : path.join(rootDir, 'generated'),
   /** 仓库内现成的 3D 风格参考图（Mock / 风格锚定） */
   styleRefPath: path.resolve(rootDir, '../app/public/images/companion/mijiang-nest-greenscreen-poster.png'),
   /** 陪伴页家居坐垫背景（用户提供，用于图生图合成） */

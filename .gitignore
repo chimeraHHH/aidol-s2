@@ -39,3 +39,6 @@ app/public/images/companion/tmp/
 ._*
 .vercel
 .env*
+server/.vercel-env-sync.json
+server/.vercel-env-parts/
+server/.vercel-env-sync.min.json

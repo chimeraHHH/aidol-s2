@@ -9,13 +9,46 @@ import { llmRouter } from './routes/llm.js'
 
 export function createApp() {
   for (const dir of [config.uploadsDir, config.generatedDir]) {
-    fs.mkdirSync(dir, { recursive: true })
+    try {
+      fs.mkdirSync(dir, { recursive: true })
+    } catch (err) {
+      console.warn('[createApp] mkdir failed:', dir, err instanceof Error ? err.message : err)
+    }
   }
 
   const app = express()
+  const allowedOrigins = config.corsOrigin
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
   app.use(
     cors({
-      origin: config.corsOrigin.split(',').map((s) => s.trim()).filter(Boolean),
+      origin(origin, callback) {
+        // 无 Origin（同源 / curl）或显式 * → 放行
+        if (!origin || allowedOrigins.includes('*')) {
+          callback(null, true)
+          return
+        }
+        if (allowedOrigins.includes(origin)) {
+          callback(null, true)
+          return
+        }
+        // 本地 Vite / 常见 Vercel 预览与生产域名
+        try {
+          const host = new URL(origin).hostname
+          if (
+            host === 'localhost' ||
+            host === '127.0.0.1' ||
+            host.endsWith('.vercel.app')
+          ) {
+            callback(null, true)
+            return
+          }
+        } catch {
+          /* ignore */
+        }
+        callback(new Error(`CORS blocked: ${origin}`))
+      },
     }),
   )
   app.use(express.json({ limit: '16mb' }))

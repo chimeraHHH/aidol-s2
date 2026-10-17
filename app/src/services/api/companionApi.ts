@@ -37,7 +37,7 @@ export type CompanionChatResponse = {
   error?: string
 }
 
-import { apiUrl } from '@/shared/lib/apiBase'
+import { apiUrl, getApiBase } from '@/shared/lib/apiBase'
 import { scopedUserId } from '@/shared/lib/deviceId'
 
 export async function chatWithCompanion(input: {
@@ -46,17 +46,34 @@ export async function chatWithCompanion(input: {
   history?: CompanionHistoryItem[]
   profile?: CompanionChatProfile
 }): Promise<CompanionChatResponse> {
-  const res = await fetch(apiUrl('/api/companion/chat'), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      ...input,
-      // 公网多用户：按「本机设备 + 账号」隔离服务端 Memory
-      userId: scopedUserId(input.userId),
-    }),
-  })
+  let res: Response
+  try {
+    res = await fetch(apiUrl('/api/companion/chat'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...input,
+        // 公网多用户：按「本机设备 + 账号」隔离服务端 Memory
+        userId: scopedUserId(input.userId),
+      }),
+    })
+  } catch {
+    const base = getApiBase()
+    throw new Error(
+      base
+        ? `连不上陪伴 API（${base}）。请确认后端已启动且 CORS 允许当前站点。`
+        : '连不上陪伴 API。本地请启动 server（8787）；上线请配置 VITE_API_BASE 指向后端。',
+    )
+  }
 
-  const data = (await res.json()) as CompanionChatResponse
+  let data: CompanionChatResponse
+  try {
+    data = (await res.json()) as CompanionChatResponse
+  } catch {
+    throw new Error(
+      `陪伴接口返回异常（HTTP ${res.status}）。多为未配置后端，请求打到了静态站。`,
+    )
+  }
   if (!res.ok || !data.ok || !data.reply) {
     throw new Error(data.error || `对话失败（HTTP ${res.status}）`)
   }
