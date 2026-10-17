@@ -39,9 +39,11 @@ const BIRTHDAY = '2024-05-18'
 const PERSONA_ID: PersonaId = 'gentle'
 const CALL_AS = '小林'
 
-const STILL = '/images/fixed/qiuqiu/scene-still.jpg'
-const CUTOUT = '/images/fixed/qiuqiu/cutout.png'
-const LOOP = '/images/fixed/qiuqiu/scene-loop.mp4'
+/** v3：用户 3D 秋秋主图 → 家居静帧 + 身份锁定循环（不用漂色的 Seedance） */
+const ASSET_VER = 'v3'
+const STILL = `/images/fixed/qiuqiu/scene-still.jpg?${ASSET_VER}`
+const CUTOUT = `/images/fixed/qiuqiu/cutout.png?${ASSET_VER}`
+const LOOP = `/images/fixed/qiuqiu/scene-loop.mp4?${ASSET_VER}`
 
 const ONBOARD_KEY = 'xiaomi.onboarding.v1'
 const ANSWERS_KEY = 'xiaomi.onboardingAnswers.v1'
@@ -159,7 +161,7 @@ function seedAvatar() {
     mock: false,
   }
   const prev = readAvatarForUser(FIXED_QIUQIU_USER_ID)
-  // 若已是固定素材路径则只补缺，不反复改 appliedAt
+  // 路径含版本号；不一致则强制覆写，避免本地仍用旧形象
   if (
     prev?.imageUrl === STILL &&
     prev?.videoUrl === LOOP &&
