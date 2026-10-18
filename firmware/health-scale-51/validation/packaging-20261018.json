@@ -1,0 +1,22 @@
+{
+  "checked_on": "2026-10-18",
+  "timezone": "Asia/Shanghai",
+  "node_test_command": "npm test",
+  "node_tests_passed": 12,
+  "node_tests_failed": 0,
+  "native_build_command": "sh firmware/health-scale-51/tools/build_physical_reader.sh",
+  "native_build_result": "passed on macOS; app compiled and ad-hoc signed without launching",
+  "plist_lint": "passed",
+  "python_syntax": "passed",
+  "web_runtime_source_matches_validated_local_version": true,
+  "static_source_files": [
+    "app.js",
+    "fixtures.json",
+    "index.html",
+    "protocol.js",
+    "serial.js",
+    "style.css"
+  ],
+  "physical_validation_summary": "web-live-20261017.json",
+  "note": "The physical validation occurred on 2026-10-17. Packaging checks do not establish a new physical measurement or calibration result."
+}

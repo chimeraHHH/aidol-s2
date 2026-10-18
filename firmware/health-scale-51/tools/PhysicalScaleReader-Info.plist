@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDisplayName</key><string>Health Scale Reader</string>
+  <key>CFBundleExecutable</key><string>PhysicalScaleReader</string>
+  <key>CFBundleIdentifier</key><string>local.aidol.healthscale.bluetoothreader</string>
+  <key>CFBundleName</key><string>Health Scale Reader</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleVersion</key><string>1</string>
+  <key>NSBluetoothAlwaysUsageDescription</key>
+  <string>Connect only to JDY-31-SPP to receive the health scale's real serial measurements. No firmware flashing.</string>
+  <key>NSBluetoothPeripheralUsageDescription</key>
+  <string>Read the existing JDY-31-SPP scale over classic Bluetooth.</string>
+</dict>
+</plist>
