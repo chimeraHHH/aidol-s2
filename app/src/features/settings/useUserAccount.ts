@@ -43,10 +43,26 @@ export const DEFAULT_USER_ACCOUNT: UserAccount = {
   localPrivacy: true,
 }
 
-/** 演示用可切换账号（小林/秋秋为固定主账号） */
+export const DAISY_ACCOUNT: UserAccount = {
+  userId: '99901',
+  displayName: 'Daisy',
+  callAs: 'Daisy',
+  phone: '13800099901',
+  email: '',
+  notifyPush: true,
+  notifyWeigh: true,
+  deltaFirst: true,
+  localPrivacy: true,
+}
+
+/**
+ * 预存演示账号（部署到网页后同样内置，不依赖本机手动添加）。
+ * 顺序与「切换账号」一致：小林 → Daisy → 铲屎官小鱼 → 团团家长
+ */
 export const DEMO_ACCOUNTS: UserAccount[] = [
   { ...FIXED_QIUQIU_ACCOUNT },
-  DEFAULT_USER_ACCOUNT,
+  { ...DAISY_ACCOUNT },
+  { ...DEFAULT_USER_ACCOUNT },
   {
     userId: '10288',
     displayName: '团团家长',
@@ -57,17 +73,13 @@ export const DEMO_ACCOUNTS: UserAccount[] = [
     deltaFirst: true,
     localPrivacy: true,
   },
-  {
-    userId: '22017',
-    displayName: '灰灰的管家',
-    phone: '18600022017',
-    email: '',
-    notifyPush: false,
-    notifyWeigh: true,
-    deltaFirst: false,
-    localPrivacy: true,
-  },
 ]
+
+const PRESET_USER_IDS = new Set(DEMO_ACCOUNTS.map((a) => a.userId))
+
+export function isPresetDemoAccount(userId: string | null | undefined): boolean {
+  return Boolean(userId && PRESET_USER_IDS.has(userId))
+}
 
 function seedStore(seed?: UserAccount): AccountStore {
   const accounts = DEMO_ACCOUNTS.map((a) => ({ ...a }))
@@ -82,6 +94,58 @@ function seedStore(seed?: UserAccount): AccountStore {
   }
 }
 
+/** 合并预存账号：保证部署/清缓存后仍有同一套演示账号 */
+function mergePresetAccounts(store: AccountStore): AccountStore {
+  const byId = new Map(store.accounts.map((a) => [a.userId, a]))
+  const presets = DEMO_ACCOUNTS.map((preset) => {
+    const existing = byId.get(preset.userId)
+    if (!existing) return { ...preset }
+    return {
+      ...preset,
+      // 保留用户改过的通知/偏好
+      notifyPush: existing.notifyPush,
+      notifyWeigh: existing.notifyWeigh,
+      deltaFirst: existing.deltaFirst,
+      localPrivacy: existing.localPrivacy,
+      callAs: existing.callAs?.trim() || preset.callAs,
+      email: existing.email || preset.email,
+      phone: existing.phone || preset.phone,
+      displayName: preset.displayName,
+    }
+  })
+  const extras = store.accounts.filter((a) => !PRESET_USER_IDS.has(a.userId))
+  const accounts = [...presets, ...extras]
+  const activeId =
+    accounts.some((a) => a.userId === store.activeId)
+      ? store.activeId
+      : accounts[0]?.userId ?? FIXED_QIUQIU_USER_ID
+
+  const sameLength = accounts.length === store.accounts.length
+  const sameOrder =
+    sameLength &&
+    accounts.every((a, i) => {
+      const b = store.accounts[i]
+      return (
+        b &&
+        a.userId === b.userId &&
+        a.displayName === b.displayName &&
+        a.phone === b.phone
+      )
+    })
+  if (sameOrder && activeId === store.activeId) return store
+  return { activeId, accounts }
+}
+
+/** App 启动时调用：写入预存账号，部署环境与本地一致 */
+export function ensurePresetDemoAccounts(): void {
+  try {
+    const merged = mergePresetAccounts(readStoreRaw())
+    writeStore(merged)
+  } catch {
+    writeStore(seedStore())
+  }
+}
+
 function readLegacy(): UserAccount | null {
   try {
     const raw = localStorage.getItem(LEGACY_KEY)
@@ -92,15 +156,14 @@ function readLegacy(): UserAccount | null {
   }
 }
 
-function readStore(): AccountStore {
+function readStoreRaw(): AccountStore {
   try {
     const raw = localStorage.getItem(KEY)
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<AccountStore>
-      // 允许空列表（删光账号后）；勿自动回种演示账号
       const accounts = Array.isArray(parsed.accounts)
         ? parsed.accounts.map((a) => ({ ...DEFAULT_USER_ACCOUNT, ...a }))
-        : seedStore().accounts
+        : []
       const activeId =
         typeof parsed.activeId === 'string' && accounts.some((a) => a.userId === parsed.activeId)
           ? parsed.activeId
@@ -111,10 +174,19 @@ function readStore(): AccountStore {
     /* fall through */
   }
   const legacy = readLegacy()
-  const store = seedStore(legacy ?? undefined)
-  writeStore(store)
-  if (legacy) localStorage.removeItem(LEGACY_KEY)
-  return store
+  if (legacy) {
+    try {
+      localStorage.removeItem(LEGACY_KEY)
+    } catch {
+      /* ignore */
+    }
+    return seedStore(legacy)
+  }
+  return seedStore()
+}
+
+function readStore(): AccountStore {
+  return mergePresetAccounts(readStoreRaw())
 }
 
 function writeStore(store: AccountStore) {
@@ -251,27 +323,21 @@ export function useUserAccount() {
     if (!current.accounts.some((a) => a.userId === userId)) {
       return { emptied: current.accounts.length === 0 }
     }
-    // 固定账号不可删
-    if (isFixedQiuqiuUserId(userId)) {
+    // 预存演示账号不可删（部署后也始终保留）
+    if (isPresetDemoAccount(userId) || isFixedQiuqiuUserId(userId)) {
       return { emptied: false, switchedTo: current.activeId }
     }
 
     purgeAccountLocalData(userId)
     const accounts = current.accounts.filter((a) => a.userId !== userId)
-
-    if (accounts.length === 0) {
-      const empty: AccountStore = { activeId: '', accounts: [] }
-      writeStore(empty)
-      setStore(empty)
-      return { emptied: true }
-    }
-
-    const switched =
-      current.activeId === userId ? accounts[0]!.userId : current.activeId
-    const next = { activeId: switched, accounts }
+    const next = mergePresetAccounts({
+      activeId:
+        current.activeId === userId ? accounts[0]?.userId ?? FIXED_QIUQIU_USER_ID : current.activeId,
+      accounts,
+    })
     writeStore(next)
     setStore(next)
-    return { emptied: false, switchedTo: switched }
+    return { emptied: false, switchedTo: next.activeId }
   }, [])
 
   const reset = useCallback(() => {

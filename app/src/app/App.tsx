@@ -4,12 +4,14 @@ import { ServicesProvider } from '@/app/providers/ServicesProvider'
 import { AppRouter } from '@/app/router'
 import { ensureWorkspaceMigrated } from '@/features/auth/accountWorkspace'
 import { ensureFixedQiuqiuAccount } from '@/features/auth/fixedQiuqiuAccount'
+import { ensurePresetDemoAccounts } from '@/features/settings/useUserAccount'
 import { PhoneShell } from '@/shared/components/PhoneShell/PhoneShell'
 import { useAppViewport } from '@/shared/hooks/useAppViewport'
 import { useIsMobileApp } from '@/shared/hooks/useIsMobileApp'
 
-// 启动时：按账号拆分工作区，并确保固定账号「小林 / 秋秋」可用
+// 启动时：工作区迁移 + 预存演示账号（部署后同样内置）+ 小林/秋秋素材
 ensureWorkspaceMigrated()
+ensurePresetDemoAccounts()
 ensureFixedQiuqiuAccount()
 
 export function App() {

@@ -759,6 +759,19 @@
   background: rgba(192, 74, 60, 0.14);
 }
 
+.accountLocked {
+  flex-shrink: 0;
+  min-width: 52px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  font-size: 0.72rem;
+  font-weight: 650;
+  text-align: center;
+  color: #9a9084;
+  background: rgba(47, 44, 42, 0.05);
+  border: 1px solid rgba(47, 44, 42, 0.06);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .page {
     animation: none;

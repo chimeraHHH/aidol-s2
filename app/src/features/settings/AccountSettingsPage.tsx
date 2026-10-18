@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { isFixedQiuqiuUserId } from '@/features/auth/fixedQiuqiuAccount'
 import { useAuthSession } from '@/features/auth/useAuthSession'
 import {
   formatUserLabel,
+  isPresetDemoAccount,
   maskPhone,
   useUserAccount,
 } from './useUserAccount'
@@ -25,18 +25,15 @@ export function AccountSettingsPage() {
   }
 
   const onDeleteAccount = (userId: string, label: string) => {
-    if (isFixedQiuqiuUserId(userId)) {
-      setError('「小林 · 秋秋」为固定演示账号，不能删除')
+    if (isPresetDemoAccount(userId)) {
+      setError('预存演示账号不能删除（部署后也会保留）')
       setTip(null)
       return
     }
     const isCurrent = userId === activeId
-    const lastOne = accounts.length <= 1
-    const msg = lastOne
-      ? `确定删除账号「${label}」？这是本机最后一个账号，删除后将退出登录。`
-      : isCurrent
-        ? `确定删除当前账号「${label}」？删除后将切换到其他账号。`
-        : `确定删除账号「${label}」？本机相关建档与聊天记录也会清除。`
+    const msg = isCurrent
+      ? `确定删除当前账号「${label}」？删除后将切换到其他账号。`
+      : `确定删除账号「${label}」？本机相关建档与聊天记录也会清除。`
     if (!window.confirm(msg)) return
 
     setError(null)
@@ -155,12 +152,13 @@ export function AccountSettingsPage() {
       <section className={styles.card} aria-label="切换账号">
         <h3 className={styles.cardTitle}>切换账号</h3>
         <p className={styles.fieldHint} style={{ marginBottom: 8 }}>
-          点选切换；右侧可删除该账号。
+          点选切换。下列为预存演示账号，部署后同样可用；自建账号可删除。
         </p>
         <ul className={styles.accountList}>
           {accounts.map((item) => {
             const active = item.userId === activeId
             const label = item.displayName || formatUserLabel(item)
+            const preset = isPresetDemoAccount(item.userId)
             return (
               <li key={item.userId} className={styles.accountRow}>
                 <button
@@ -180,6 +178,7 @@ export function AccountSettingsPage() {
                     <strong>{label}</strong>
                     <em>
                       {formatUserLabel(item)} · {maskPhone(item.phone)}
+                      {preset ? ' · 预存' : ''}
                     </em>
                   </span>
                   {active ? (
@@ -188,17 +187,23 @@ export function AccountSettingsPage() {
                     <span className={styles.rowChevron}>›</span>
                   )}
                 </button>
-                <button
-                  type="button"
-                  className={styles.accountDelete}
-                  aria-label={`删除 ${label}`}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onDeleteAccount(item.userId, label)
-                  }}
-                >
-                  删除
-                </button>
+                {preset ? (
+                  <span className={styles.accountLocked} aria-label="预存账号不可删除">
+                    预存
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    className={styles.accountDelete}
+                    aria-label={`删除 ${label}`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onDeleteAccount(item.userId, label)
+                    }}
+                  >
+                    删除
+                  </button>
+                )}
               </li>
             )
           })}
