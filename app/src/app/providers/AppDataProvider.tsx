@@ -11,6 +11,7 @@ import type {
   CatProfile,
   CompanionState,
   DeviceInfo,
+  DeviceMode,
   Measurement,
   TrendPoint,
 } from '@/domain/types'
@@ -26,7 +27,10 @@ interface AppDataValue {
   refresh: () => Promise<void>
   setCompanion: (patch: Partial<CompanionState>) => Promise<void>
   recordMeasurement: (m: Measurement) => Promise<void>
+  /** 连接小咪；实物模式下必须由按钮点击触发（会弹出 Chrome 设备选择器） */
   connectDevice: () => Promise<void>
+  disconnectDevice: () => Promise<void>
+  setDeviceMode: (mode: DeviceMode) => Promise<void>
 }
 
 const AppDataContext = createContext<AppDataValue | null>(null)
@@ -73,6 +77,9 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     }
   }, [refresh])
 
+  // 设备状态、实时读数由设备服务推送
+  useEffect(() => device.subscribe(setDeviceInfo), [device])
+
   const setCompanion = useCallback(
     async (patch: Partial<CompanionState>) => {
       const next = await cat.updateCompanion(patch)
@@ -90,9 +97,26 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   )
 
   const connectDevice = useCallback(async () => {
-    const d = await device.connect()
-    setDeviceInfo(d)
+    try {
+      const d = await device.connect({ interactive: true })
+      setDeviceInfo(d)
+    } catch {
+      // 错误信息已写进 device.lastError，由订阅推送到界面
+      setDeviceInfo(await device.getDevice())
+    }
   }, [device])
+
+  const disconnectDevice = useCallback(async () => {
+    await device.disconnect()
+    setDeviceInfo(await device.getDevice())
+  }, [device])
+
+  const setDeviceMode = useCallback(
+    async (mode: DeviceMode) => {
+      setDeviceInfo(await device.setMode(mode))
+    },
+    [device],
+  )
 
   const value = useMemo<AppDataValue>(
     () => ({
@@ -106,6 +130,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       setCompanion,
       recordMeasurement,
       connectDevice,
+      disconnectDevice,
+      setDeviceMode,
     }),
     [
       ready,
@@ -118,6 +144,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       setCompanion,
       recordMeasurement,
       connectDevice,
+      disconnectDevice,
+      setDeviceMode,
     ],
   )
 

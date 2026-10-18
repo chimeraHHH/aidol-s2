@@ -10,24 +10,77 @@ import styles from './WeighPage.module.scss'
 export function WeighPage() {
   const navigate = useNavigate()
   const { device } = useServices()
-  const { recordMeasurement } = useAppData()
+  const {
+    recordMeasurement,
+    measurements,
+    companion,
+    device: deviceInfo,
+    connectDevice,
+    setDeviceMode,
+  } = useAppData()
   const [phase, setPhase] = useState<WeighPhase>('idle')
   const [live, setLive] = useState<number | null>(null)
   const [result, setResult] = useState<Measurement | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
+  const [sessionKey, setSessionKey] = useState(0)
+  const [connecting, setConnecting] = useState(false)
   const cancelRef = useRef<(() => void) | null>(null)
+  // 会话开始时取一次，避免保存记录后重启会话
+  const previousKgRef = useRef<number | null>(null)
+  const personaRef = useRef(companion?.personaId)
+  const latestKg = measurements[0]?.weightKg ?? null
+  const personaId = companion?.personaId
+  useEffect(() => {
+    previousKgRef.current = latestKg
+    personaRef.current = personaId
+  }, [latestKg, personaId])
 
   useEffect(() => {
-    const cancel = device.startWeighSession({
-      onPhase: setPhase,
-      onLiveWeight: setLive,
-      onLocked: (m) => {
-        setResult(m)
-        void recordMeasurement(m)
+    const cancel = device.startWeighSession(
+      {
+        onPhase: setPhase,
+        onLiveWeight: setLive,
+        onLocked: (m) => {
+          setResult(m)
+          void recordMeasurement(m)
+        },
+        onError: setError,
+        onNotice: setNotice,
       },
-    })
+      { previousKg: previousKgRef.current, personaId: personaRef.current },
+    )
     cancelRef.current = cancel
     return () => cancel()
-  }, [device, recordMeasurement])
+  }, [device, recordMeasurement, sessionKey])
+
+  const isDemo = (deviceInfo?.mode ?? 'demo') === 'demo'
+  const needsConnect = phase === 'idle' && !!error
+
+  const restartSession = () => {
+    setError(null)
+    setNotice(null)
+    setLive(null)
+    setResult(null)
+    setSessionKey((k) => k + 1)
+  }
+
+  const onConnect = async () => {
+    setConnecting(true)
+    try {
+      await connectDevice()
+    } finally {
+      setConnecting(false)
+    }
+    const info = await device.getDevice()
+    if (info.connection === 'connected') restartSession()
+    else if (info.lastError) setError(info.lastError)
+  }
+
+  const onUseDemo = async () => {
+    await setDeviceMode('demo')
+    restartSession()
+  }
 
   const busy =
     phase === 'connecting' || phase === 'waiting' || phase === 'fluctuating' || phase === 'ai'
@@ -92,7 +145,9 @@ export function WeighPage() {
             </div>
           </div>
 
-          {complete ? (
+          {needsConnect ? (
+            <div className={`${styles.badge} ${styles.badgeError}`}>{error}</div>
+          ) : complete ? (
             <div className={styles.badge}>
               <span className={styles.badgeIcon} aria-hidden>
                 <CheckIcon />
@@ -101,9 +156,12 @@ export function WeighPage() {
             </div>
           ) : (
             <div className={`${styles.badge} ${styles.badgeBusy}`}>
-              {badgeCopy(phase)}
+              {notice ?? badgeCopy(phase)}
             </div>
           )}
+          <div className={styles.sourceTag}>
+            {isDemo ? '演示数据 · 非实物测量' : `小咪实物 · ${deviceInfo?.transportLabel ?? '蓝牙串口'}`}
+          </div>
         </section>
 
         <div className={styles.hero} aria-hidden>
@@ -116,7 +174,28 @@ export function WeighPage() {
         </div>
 
         <div className={styles.actions}>
-          {complete ? (
+          {needsConnect ? (
+            <>
+              {!isDemo ? (
+                <Button
+                  block
+                  disabled={connecting || !!deviceInfo?.supportProblem}
+                  onClick={() => void onConnect()}
+                >
+                  {connecting ? '连接中…' : '连接小咪'}
+                </Button>
+              ) : (
+                <Button block onClick={restartSession}>
+                  重新开始
+                </Button>
+              )}
+              {!isDemo ? (
+                <Button variant="secondary" block onClick={() => void onUseDemo()}>
+                  没有硬件？用演示模式
+                </Button>
+              ) : null}
+            </>
+          ) : complete ? (
             <Button className={styles.saveBtn} block onClick={() => navigate('/')}>
               保存记录
             </Button>

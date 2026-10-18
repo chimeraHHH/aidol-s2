@@ -31,7 +31,15 @@ function calcAgeText(birthday: string | undefined): string {
 
 export function SettingsPage() {
   const navigate = useNavigate()
-  const { profile, device, companion, measurements, connectDevice } = useAppData()
+  const {
+    profile,
+    device,
+    companion,
+    measurements,
+    connectDevice,
+    disconnectDevice,
+    setDeviceMode,
+  } = useAppData()
   const { avatar: customAvatar, clear: clearAvatar } = useCustomCatAvatar()
   const { job, generating, start: startGenerateJob } = useAvatarGenerateJob()
   const { account, patch: patchAccount } = useUserAccount()
@@ -50,6 +58,18 @@ export function SettingsPage() {
         : '温柔陪聊'
   const latest = measurements[0] ?? null
   const connected = device?.connection === 'connected'
+  const deviceMode = device?.mode ?? 'demo'
+  const isDemo = deviceMode === 'demo'
+  const live = device?.liveReading ?? null
+  const deviceStatus = connected
+    ? isDemo
+      ? '演示中'
+      : '已连接'
+    : device?.connection === 'connecting' || connecting
+      ? '连接中'
+      : device?.connection === 'error'
+        ? '连接失败'
+        : '未连接'
   const hasGeneratedAvatar = Boolean(customAvatar?.cutoutUrl || customAvatar?.imageUrl)
   const displayAvatar = hasGeneratedAvatar
     ? customAvatar!.cutoutUrl || customAvatar!.imageUrl!
@@ -70,6 +90,15 @@ export function SettingsPage() {
     setConnecting(true)
     try {
       await connectDevice()
+    } finally {
+      setConnecting(false)
+    }
+  }
+
+  const onDisconnect = async () => {
+    setConnecting(true)
+    try {
+      await disconnectDevice()
     } finally {
       setConnecting(false)
     }
@@ -239,9 +268,27 @@ export function SettingsPage() {
       <section className={styles.card} aria-label="设备">
         <div className={styles.cardHead}>
           <h3>猫窝体重秤</h3>
-          <span className={connected ? styles.statusOn : styles.statusOff}>
-            {connected ? '已连接' : '未连接'}
-          </span>
+          <span className={connected ? styles.statusOn : styles.statusOff}>{deviceStatus}</span>
+        </div>
+        <div className={styles.modeSwitch} role="group" aria-label="接入方式">
+          <button
+            type="button"
+            className={`${styles.modeBtn}${!isDemo ? ` ${styles.modeBtnOn}` : ''}`}
+            aria-pressed={!isDemo}
+            disabled={connecting}
+            onClick={() => void setDeviceMode('serial')}
+          >
+            实物蓝牙
+          </button>
+          <button
+            type="button"
+            className={`${styles.modeBtn}${isDemo ? ` ${styles.modeBtnOn}` : ''}`}
+            aria-pressed={isDemo}
+            disabled={connecting}
+            onClick={() => void setDeviceMode('demo')}
+          >
+            演示模式
+          </button>
         </div>
         <div className={styles.deviceRow}>
           <img
@@ -252,27 +299,61 @@ export function SettingsPage() {
           />
           <div className={styles.deviceCopy}>
             <strong>{device?.name ?? '小咪'}</strong>
-            <span>固件 {device?.firmware ?? '—'}</span>
-            {device?.batteryPercent != null ? (
+            <span>
+              {device?.transportLabel ?? `固件 ${device?.firmware ?? '—'}`}
+            </span>
+            {connected && live ? (
+              <span className={styles.liveLine} aria-live="polite">
+                实时读数{' '}
+                <b>{live.weightKg != null ? `${live.weightKg.toFixed(1)} kg` : '—'}</b>
+                {' · '}
+                {new Date(live.at).toLocaleTimeString('zh-CN', { hour12: false })}
+              </span>
+            ) : connected ? (
+              <span>等待秤的数据…</span>
+            ) : device?.batteryPercent != null ? (
               <span>电量 {device.batteryPercent}%</span>
             ) : (
-              <span>电量读取中…</span>
+              <span>{isDemo ? '模拟数据，不连接硬件' : '先在 Mac 系统蓝牙里配对 JDY-31-SPP'}</span>
             )}
           </div>
         </div>
-        <div className={styles.cardActions}>
+        {!isDemo && device?.supportProblem ? (
+          <p className={styles.deviceHint}>{device.supportProblem}</p>
+        ) : null}
+        {device?.lastError ? <p className={styles.avatarError}>{device.lastError}</p> : null}
+        {!isDemo && !connected && !device?.supportProblem ? (
+          <p className={styles.deviceHint}>
+            点「连接小咪」后，在 Chrome 弹窗里选择 <code>cu.JDY-31-SPP</code>。
+          </p>
+        ) : null}
+        <div className={`${styles.cardActions} ${styles.cardActionsRow}`}>
           {connected ? (
-            <button type="button" className={styles.btnGhost} onClick={() => navigate('/weigh')}>
-              开始测量
-            </button>
+            <>
+              <button type="button" className={styles.btnGhost} onClick={() => navigate('/weigh')}>
+                开始测量
+              </button>
+              <button
+                type="button"
+                className={styles.btnGhost}
+                disabled={connecting}
+                onClick={() => void onDisconnect()}
+              >
+                {isDemo ? '停止演示' : '断开连接'}
+              </button>
+            </>
           ) : (
             <button
               type="button"
               className={styles.btnPrimary}
-              disabled={connecting}
+              disabled={connecting || device?.connection === 'connecting' || (!isDemo && !!device?.supportProblem)}
               onClick={() => void onConnect()}
             >
-              {connecting ? '连接中…' : '重新连接'}
+              {connecting || device?.connection === 'connecting'
+                ? '连接中…'
+                : isDemo
+                  ? '启动演示'
+                  : '连接小咪'}
             </button>
           )}
         </div>

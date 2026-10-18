@@ -764,3 +764,63 @@
     animation: none;
   }
 }
+
+/* —— 设备接入：实物蓝牙 / 演示模式 —— */
+.modeSwitch {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: rgba(107, 66, 53, 0.08);
+}
+
+.modeBtn {
+  flex: 1;
+  min-height: 30px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--xm-ink-muted);
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.modeBtn:disabled {
+  opacity: 0.55;
+}
+
+.modeBtnOn {
+  background: #fff;
+  color: var(--xm-brown);
+  box-shadow: 0 2px 8px rgba(107, 66, 53, 0.12);
+}
+
+.liveLine b {
+  color: var(--xm-brown);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.deviceHint {
+  margin: 10px 0 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--xm-ink-muted);
+}
+
+.deviceHint code {
+  font-size: 0.7rem;
+  padding: 1px 5px;
+  border-radius: 6px;
+  background: rgba(107, 66, 53, 0.08);
+  color: var(--xm-brown);
+}
+
+.cardActionsRow {
+  display: flex;
+  gap: 10px;
+}
+
+.btnGhost:disabled {
+  opacity: 0.55;
+}

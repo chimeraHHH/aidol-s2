@@ -283,3 +283,27 @@
     animation: none;
   }
 }
+
+/* —— 小咪实物连接（蓝牙串口）—— */
+.badgeError {
+  max-width: 300px;
+  padding: 8px 16px;
+  color: #c04a3c;
+  background: rgba(232, 93, 76, 0.12);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.sourceTag {
+  margin-top: -6px;
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  color: #a08a74;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
