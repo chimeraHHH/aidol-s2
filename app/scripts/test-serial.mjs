@@ -11,7 +11,7 @@ import ts from 'typescript'
 const here = dirname(fileURLToPath(import.meta.url))
 const srcDir = join(here, '../src/services/serial')
 const out = mkdtempSync(join(tmpdir(), 'xm-serial-'))
-for (const name of ['scaleProtocol', 'webSerial', 'demoScaleSource', 'ScaleDeviceService']) {
+for (const name of ['scaleProtocol', 'webSerial', 'nativeBridge', 'demoScaleSource', 'ScaleDeviceService']) {
   const code = ts.transpileModule(readFileSync(join(srcDir, `${name}.ts`), 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022, verbatimModuleSyntax: true },
   }).outputText.replace(/from '\.\/(\w+)'/g, "from './$1.js'")

@@ -94,7 +94,7 @@ export class ScaleDeviceService implements IDeviceService {
     this.storage = opts.storage === undefined ? safeStorage() : opts.storage
     // localhost 可用本机桥接，不强制要求 Web Serial
     const problem =
-      opts.supportProblem?.() ??
+      opts.supportProblem ? opts.supportProblem() :
       (isLocalhost() ? null : serialSupportProblem())
     const saved = this.storage?.getItem(MODE_KEY)
     const mode: DeviceMode =
@@ -339,7 +339,7 @@ export class ScaleDeviceService implements IDeviceService {
     }
 
     // 2) 回退 Web Serial
-    const problem = this.info.supportProblem ?? serialSupportProblem()
+    const problem = this.opts.supportProblem ? this.opts.supportProblem() : serialSupportProblem()
     if (problem || !this.serialApi) {
       const message =
         problem ??

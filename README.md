@@ -525,3 +525,12 @@ npm run build
 本次追加仅补充文档，不创建 `final` 标签或替团队认定冻结版本。最终提交前，应在实际交付仓库按赛事要求设置 `final`，用 `git rev-parse HEAD` 获取完整40位commit，核对代码、视频和作品说明对应同一版本。硬件需补交实际采集固件及运行/烧录说明；Web主仓不能代替尚未归档的固件。
 
 尚待团队补齐的实物参数、采集代码来源与入口、真实通信接线和协议、最终实际模型配置、实机视频、测量验证与冻结commit，以最终实物和提交材料为准。
+
+
+## 2026-10-18 最终提交：独立手机表情遥控台
+
+已将独立遥控台完整源码、7段视频素材、测试与部署配置纳入 [`controller/`](controller/README.md)。在线演示：https://wozhi-controller.vercel.app/ 。电脑连接手机后，可切换待机/睡眠、启动/唤醒、称重/开心互动三种状态，以及小黑球、小鱼、寄居蟹、彩色光点四个逗猫视频。手机首次点击开始后循环播放，后续由电脑遥控；称重状态目前手动选择。
+
+源码同步自 `duliangkuan/wozhi-controller` 提交 `e81b0b751b6ede2a22afd23646a82513d187820f`。运行与数据库配置参见子目录README，实际凭据不入库。
+
+本次最终冻结以 **`final` 标签指向的提交** 为准，取代上文“尚未创建final”的历史进度描述。提交表填写 `git rev-parse final^{commit}` 的40位结果；后续开发在 `post-final-development` 或其他新分支进行，不移动或覆盖 `final`。冻结范围与验收边界见 [`SUBMISSION_FREEZE.md`](SUBMISSION_FREEZE.md)。

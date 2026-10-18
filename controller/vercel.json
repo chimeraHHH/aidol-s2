@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "public",
+  "framework": null,
+  "regions": ["hkg1"],
+  "functions": { "api/index.js": { "maxDuration": 15 } },
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index?route=:path*" },
+    { "source": "/screen", "destination": "/screen.html" },
+    { "source": "/remote", "destination": "/index.html" }
+  ],
+  "headers": [
+    { "source": "/(.*)", "headers": [
+      { "key": "Referrer-Policy", "value": "no-referrer" },
+      { "key": "X-Content-Type-Options", "value": "nosniff" }
+    ] },
+    { "source": "/media/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }] }
+  ]
+}
