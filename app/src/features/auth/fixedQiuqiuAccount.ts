@@ -2,7 +2,7 @@
  * 固定演示账号：小林 × 秋秋
  * 形象素材来自本机成功生成流水线，落在 public/images/fixed/qiuqiu/
  */
-import type { PersonaId } from '@/domain/types'
+import type { Measurement, PersonaId } from '@/domain/types'
 import {
   readCompanionChatCache,
   seedCompanionWelcome,
@@ -18,6 +18,27 @@ import {
   writeCatStoreForUser,
   type WorkspaceCatAvatar,
 } from './accountWorkspace'
+
+/** 秋秋演示用「今日体重」 */
+const TODAY_WEIGHT_KG = 4.5
+
+/** 保证秋秋最新一条称重为今日 4.5 kg（newest first） */
+function withQiuqiuTodayWeight(base: Measurement[]): Measurement[] {
+  const source = (base.length > 0 ? base : SEED_MEASUREMENTS).map((m) => ({ ...m }))
+  const day = new Date().toISOString().slice(0, 10)
+  const rest = source
+    .filter((m) => !m.lockedAt.startsWith(day) && m.sessionId !== `qiuqiu-${day}`)
+    .sort((a, b) => b.lockedAt.localeCompare(a.lockedAt))
+  const prevKg = rest[0]?.weightKg ?? 4.45
+  const today: Measurement = {
+    sessionId: `qiuqiu-${day}`,
+    weightKg: TODAY_WEIGHT_KG,
+    deltaKg: Number((TODAY_WEIGHT_KG - prevKg).toFixed(2)),
+    lockedAt: `${day}T10:00:00.000Z`,
+    source: 'mock',
+  }
+  return [today, ...rest]
+}
 
 export const FIXED_QIUQIU_USER_ID = '33801'
 
@@ -144,9 +165,10 @@ function seedCatWorkspace() {
       streakDays: existing.companion.streakDays || 3,
       bond: existing.companion.bond || 72,
     },
-    // 固定账号始终带一份可演示的称重曲线
-    measurements:
+    // 固定账号始终带一份可演示的称重曲线，并锁定今日体重 4.5 kg
+    measurements: withQiuqiuTodayWeight(
       existing.measurements?.length > 0 ? existing.measurements : [...SEED_MEASUREMENTS],
+    ),
   })
   return !already
 }
