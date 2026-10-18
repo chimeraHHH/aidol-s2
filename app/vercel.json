@@ -13,7 +13,7 @@
       "destination": "https://aidol-s2-api.vercel.app/uploads/$1"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/|generated/|uploads/).*)",
       "destination": "/index.html"
     }
   ]

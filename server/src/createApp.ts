@@ -39,7 +39,9 @@ export function createApp() {
           if (
             host === 'localhost' ||
             host === '127.0.0.1' ||
-            host.endsWith('.vercel.app')
+            host.endsWith('.vercel.app') ||
+            host === 'aidol.dufengyun.xyz' ||
+            host.endsWith('.dufengyun.xyz')
           ) {
             callback(null, true)
             return

@@ -29,9 +29,6 @@ export type UserMemory = {
 const MAX_NOTES = 40
 const MAX_TURNS = 24
 
-/** Serverless 无盘 / 写失败时的进程内兜底（冷启动会丢） */
-const memoryFallback = new Map<string, UserMemory>()
-
 function safeUserId(userId: string): string {
   const cleaned = userId.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64)
   return cleaned || 'default'
@@ -52,43 +49,34 @@ function emptyMemory(userId: string): UserMemory {
 }
 
 export function loadMemory(userId: string): UserMemory {
-  const id = safeUserId(userId)
+  fs.mkdirSync(memoryRootDir, { recursive: true })
+  const fp = filePath(userId)
+  if (!fs.existsSync(fp)) return emptyMemory(userId)
   try {
-    fs.mkdirSync(memoryRootDir, { recursive: true })
-    const fp = filePath(id)
-    if (!fs.existsSync(fp)) {
-      return memoryFallback.get(id) ?? emptyMemory(id)
-    }
     const raw = JSON.parse(fs.readFileSync(fp, 'utf8')) as Partial<UserMemory>
     return {
-      ...emptyMemory(id),
+      ...emptyMemory(userId),
       ...raw,
-      userId: id,
+      userId: safeUserId(userId),
       notes: Array.isArray(raw.notes) ? raw.notes : [],
       recentTurns: Array.isArray(raw.recentTurns) ? raw.recentTurns : [],
       recentSummary: typeof raw.recentSummary === 'string' ? raw.recentSummary : '',
     }
   } catch {
-    return memoryFallback.get(id) ?? emptyMemory(id)
+    return emptyMemory(userId)
   }
 }
 
 export function saveMemory(mem: UserMemory): void {
-  const next: UserMemory = {
+  fs.mkdirSync(memoryRootDir, { recursive: true })
+  const next = {
     ...mem,
     userId: safeUserId(mem.userId),
     updatedAt: new Date().toISOString(),
     notes: mem.notes.slice(-MAX_NOTES),
     recentTurns: mem.recentTurns.slice(-MAX_TURNS),
   }
-  memoryFallback.set(next.userId, next)
-  try {
-    fs.mkdirSync(memoryRootDir, { recursive: true })
-    fs.writeFileSync(filePath(next.userId), JSON.stringify(next, null, 2), 'utf8')
-  } catch (err) {
-    // Vercel 只读盘等：保留内存兜底，不阻断对话
-    console.warn('[memoryStore] persist skipped:', err instanceof Error ? err.message : err)
-  }
+  fs.writeFileSync(filePath(next.userId), JSON.stringify(next, null, 2), 'utf8')
 }
 
 export function appendNote(userId: string, text: string, source: MemoryEntry['source'] = 'chat'): UserMemory {
