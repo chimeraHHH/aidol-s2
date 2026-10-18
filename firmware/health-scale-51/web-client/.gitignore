@@ -1,0 +1,9 @@
+reports/
+__pycache__/
+*.zip
+*.tar.gz
+.DS_Store
+.openai/
+# This dist directory contains hand-written static source, not build output.
+!dist/
+!dist/**

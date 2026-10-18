@@ -1,0 +1,11 @@
+build/
+reports/
+physical/
+vendor-original/
+vendor-docs/
+android-apps/
+*.apk
+*.bin
+*.app/
+__pycache__/
+.DS_Store

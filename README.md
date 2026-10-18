@@ -23,6 +23,7 @@
 
 - [项目简介](#项目简介)
 - [在线演示](#在线演示)
+- [实物蓝牙串口联调](#实物蓝牙串口联调)
 - [功能地图](#功能地图)
 - [信息架构与路由](#信息架构与路由)
 - [设计语言](#设计语言)
@@ -63,6 +64,21 @@
 | 源码 | https://github.com/chimeraHHH/aidol-s2 |
 
 建议用手机浏览器打开，或桌面端拉窄窗口体验全屏；宽屏会看到带 Dynamic Island 的手机框。
+
+---
+
+## 实物蓝牙串口联调
+
+新增独立的 [JDY-31 健康秤网页实验台](firmware/health-scale-51/README.md)，用于接收开发板真实串口报文、查看重量曲线和调试 ASCII / HEX 命令。
+
+```sh
+cd firmware/health-scale-51/web-client
+python3 serve.py --port 18765
+```
+
+在 Chrome 打开 `http://127.0.0.1:18765`。macOS 已验证的连接路径为「真实设备」→「USB / 系统串口」→ `cu.JDY-31-SPP`，参数 9600、8-N-1、GBK。直接蓝牙路径出现 `SDP query timeout` 时使用此系统映射串口。
+
+2026-10-17 已验证网页实时接收，RX 与样本数连续增长；[实测汇总](firmware/health-scale-51/validation/web-live-20261017.json) 单独记录传输验证与尚未验证的测量精度。该实验台与上面的产品业务页面分开运行。
 
 ---
 
