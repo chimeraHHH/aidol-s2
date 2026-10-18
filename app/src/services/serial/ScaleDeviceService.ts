@@ -20,6 +20,10 @@ import {
   type StabilityOptions,
 } from './scaleProtocol'
 import {
+  connectNativeBridge,
+  probeNativeBridge,
+} from './nativeBridge'
+import {
   SCALE_SERIAL_OPTIONS,
   SerialConnection,
   describeSerialError,
@@ -31,6 +35,8 @@ import {
 
 const MODE_KEY = 'xm:device-mode'
 const PORT_KEY = 'xm:device-port-info'
+/** 连接通道：本机原生桥接（优先）或 Chrome Web Serial */
+type SerialTransport = 'bridge' | 'web-serial' | null
 
 export interface ScaleDeviceServiceOptions {
   baseDevice: DeviceInfo
@@ -62,7 +68,8 @@ function isLocalhost(): boolean {
 
 /**
  * 小咪猫窝秤设备服务。
- * - serial：实物，Chrome Web Serial 打开 macOS 配对后映射出的 cu.JDY-31-SPP（经典蓝牙 SPP）。
+ * - serial：优先接本机原生桥接（PhysicalScaleReader → start_viewer.py SSE）；
+ *   桥接不可用时回退到 Chrome Web Serial（cu.JDY-31-SPP）。
  * - demo：演示，生成固件同格式字节流，走同一条解析链路。
  * 两种模式产出的读数都经过 PacketDecoder → ScaleFrameAssembler → StabilityDetector。
  */
@@ -71,6 +78,8 @@ export class ScaleDeviceService implements IDeviceService {
   private listeners = new Set<(d: DeviceInfo) => void>()
   private readingListeners = new Set<(r: ScaleReading) => void>()
   private serial: SerialConnection | null = null
+  private stopBridge: (() => void) | null = null
+  private transport: SerialTransport = null
   private demo: DemoScaleSource
   private decoder!: PacketDecoder
   private assembler!: ScaleFrameAssembler
@@ -83,7 +92,10 @@ export class ScaleDeviceService implements IDeviceService {
     this.opts = opts
     this.serialApi = opts.serialApi === undefined ? getSerialApi() : opts.serialApi
     this.storage = opts.storage === undefined ? safeStorage() : opts.storage
-    const problem = (opts.supportProblem ?? serialSupportProblem)()
+    // localhost 可用本机桥接，不强制要求 Web Serial
+    const problem =
+      opts.supportProblem?.() ??
+      (isLocalhost() ? null : serialSupportProblem())
     const saved = this.storage?.getItem(MODE_KEY)
     const mode: DeviceMode =
       saved === 'serial' || saved === 'demo' ? saved : !problem && isLocalhost() ? 'serial' : 'demo'
@@ -166,6 +178,9 @@ export class ScaleDeviceService implements IDeviceService {
       lastError: null,
       transportLabel: this.info.mode === 'demo' ? '演示模式' : '蓝牙串口 · 未连接',
     })
+    this.stopBridge?.()
+    this.stopBridge = null
+    this.transport = null
     if (this.serial) await this.serial.disconnect()
     this.decoder.finish()
   }
@@ -318,13 +333,92 @@ export class ScaleDeviceService implements IDeviceService {
       return { ...this.info }
     }
 
-    const problem = this.info.supportProblem ?? null
+    // 1) 优先本机原生桥接（与 PhysicalScaleReader / start_viewer.py 同源数据）
+    if (isLocalhost() && (await probeNativeBridge())) {
+      return this.connectViaBridge()
+    }
+
+    // 2) 回退 Web Serial
+    const problem = this.info.supportProblem ?? serialSupportProblem()
     if (problem || !this.serialApi) {
-      const message = problem ?? '当前浏览器不支持 Web Serial'
+      const message =
+        problem ??
+        (isLocalhost()
+          ? '本机蓝牙桥接未启动。请打开 PhysicalScaleReader，并在迁移包目录运行 python3 start_viewer.py'
+          : '当前浏览器不支持 Web Serial')
       this.patch({ connection: 'error', lastError: message })
       throw new Error(message)
     }
 
+    return this.connectViaWebSerial(interactive)
+  }
+
+  private connectViaBridge(): Promise<DeviceInfo> {
+    this.stopBridge?.()
+    this.stopBridge = null
+    this.transport = 'bridge'
+    this.patch({ connection: 'connecting', lastError: null })
+
+    return new Promise((resolve, reject) => {
+      let settled = false
+      const failTimer = window.setTimeout(() => {
+        if (settled) return
+        settled = true
+        this.stopBridge?.()
+        this.stopBridge = null
+        this.transport = null
+        const message =
+          '本机蓝牙桥接无数据：请确认 PhysicalScaleReader 已连上 JDY-31-SPP 并持续收包'
+        this.patch({ connection: 'error', lastError: message })
+        reject(new Error(message))
+      }, 8000)
+
+      this.stopBridge = connectNativeBridge({
+        data: (b) => {
+          if (!settled) {
+            settled = true
+            window.clearTimeout(failTimer)
+            this.patch({
+              connection: 'connected',
+              lastError: null,
+              transportLabel: '本机蓝牙桥接 · 实时',
+              lastSeenAt: new Date().toISOString(),
+            })
+            resolve({ ...this.info })
+          }
+          this.feed(b)
+        },
+        status: (s) => {
+          if (s === 'connecting') this.patch({ connection: 'connecting' })
+          if (s === 'closed' && this.transport === 'bridge' && this.info.connection === 'connected') {
+            this.decoder.finish()
+            this.patch({
+              connection: 'disconnected',
+              transportLabel: '本机蓝牙桥接 · 已断开',
+              lastError: '本机桥接断开：请检查 PhysicalScaleReader 与 start_viewer.py',
+            })
+            this.transport = null
+          }
+        },
+        error: (message) => {
+          if (settled) {
+            this.patch({ lastError: message })
+            return
+          }
+          settled = true
+          window.clearTimeout(failTimer)
+          this.stopBridge?.()
+          this.stopBridge = null
+          this.transport = null
+          this.patch({ connection: 'error', lastError: message })
+          reject(new Error(message))
+        },
+      })
+    })
+  }
+
+  private async connectViaWebSerial(interactive: boolean): Promise<DeviceInfo> {
+    this.transport = 'web-serial'
     let port: SerialPortLike | undefined
     if (!interactive) {
       port = await this.pickGrantedPort()
@@ -335,7 +429,7 @@ export class ScaleDeviceService implements IDeviceService {
     }
 
     if (!this.serial) {
-      this.serial = new SerialConnection(this.serialApi, {
+      this.serial = new SerialConnection(this.serialApi!, {
         data: (b) => this.feed(b),
         status: (s) => {
           if (s === 'connecting') this.patch({ connection: 'connecting' })
@@ -346,6 +440,7 @@ export class ScaleDeviceService implements IDeviceService {
               transportLabel: '蓝牙串口 · 已断开',
               lastError: this.info.lastError ?? '小咪断开了连接（关机、走远或被其他程序占用）',
             })
+            this.transport = null
           }
         },
         error: (e) =>
@@ -370,6 +465,7 @@ export class ScaleDeviceService implements IDeviceService {
       })
       return { ...this.info }
     } catch (error) {
+      this.transport = null
       const message = describeSerialError(error)
       const cancelledPick = (error as { name?: string })?.name === 'NotFoundError'
       this.patch({ connection: cancelledPick ? 'disconnected' : 'error', lastError: message })

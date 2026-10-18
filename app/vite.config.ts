@@ -26,6 +26,21 @@ export default defineConfig({
         target: 'http://127.0.0.1:8787',
         changeOrigin: true,
       },
+      // 本机原生 JDY 桥接：PhysicalScaleReader → start_viewer.py(:18765)
+      '/jdy-bridge': {
+        target: 'http://127.0.0.1:18765',
+        changeOrigin: true,
+        rewrite: (path) => {
+          const rest = path.replace(/^\/jdy-bridge/, '')
+          return rest === '' ? '/' : rest
+        },
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('origin')
+            proxyReq.setHeader('host', '127.0.0.1:18765')
+          })
+        },
+      },
     },
   },
 })

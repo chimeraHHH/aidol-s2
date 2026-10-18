@@ -43,7 +43,14 @@ export function WeighPage() {
         onLiveWeight: setLive,
         onLocked: (m) => {
           setResult(m)
-          void recordMeasurement(m)
+          if (m.weightKg < 5) {
+            setNotice('读数不足 5 kg，未写入健康页体重看板（空窝 / 过轻不记录）')
+            return
+          }
+          setNotice(null)
+          void recordMeasurement(m).then(() => {
+            setNotice('已写入健康页体重看板')
+          })
         },
         onError: setError,
         onNotice: setNotice,
@@ -196,8 +203,15 @@ export function WeighPage() {
               ) : null}
             </>
           ) : complete ? (
-            <Button className={styles.saveBtn} block onClick={() => navigate('/')}>
-              保存记录
+            <Button
+              className={styles.saveBtn}
+              block
+              onClick={() => {
+                cancelRef.current?.()
+                navigate('/trends')
+              }}
+            >
+              {result && result.weightKg >= 5 ? '查看健康看板' : '返回'}
             </Button>
           ) : (
             <Button

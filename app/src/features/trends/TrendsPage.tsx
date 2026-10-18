@@ -22,11 +22,15 @@ import {
 } from './data/kittenSim'
 import {
   PERIODS,
+  buildWeightSeries,
   periodMeta,
   type SeriesPoint,
   type WeightPeriod,
 } from './weightSeries'
 import styles from './TrendsPage.module.scss'
+
+/** 与称重同步规则一致：不足 5kg 不进健康看板 */
+const BOARD_MIN_KG = 5
 
 export function TrendsPage() {
   const { avatar: customAvatar } = useCustomCatAvatar()
@@ -39,17 +43,24 @@ export function TrendsPage() {
   const [period, setPeriod] = useState<WeightPeriod>('day')
   const [boardOpen, setBoardOpen] = useState(false)
 
-  /** Summary chart: last 14 daily / 12 monthly / all yearly from Excel sim. */
+  const boardMeasurements = useMemo(
+    () => measurements.filter((m) => m.weightKg >= BOARD_MIN_KG),
+    [measurements],
+  )
+  const usingLive = boardMeasurements.length > 0
+
+  /** 有实物/称重记录时用真实数据；否则保留演示曲线 */
   const series = useMemo(() => {
+    if (usingLive) return buildWeightSeries(boardMeasurements, period)
     const all = simSeries(period)
     if (period === 'day') return all.slice(-14)
     if (period === 'month') return all.slice(-12)
     return all
-  }, [period])
+  }, [boardMeasurements, period, usingLive])
   const meta = periodMeta(period)
   const analysis = SIM_ANALYSIS
 
-  const latest = measurements[0] ?? null
+  const latest = boardMeasurements[0] ?? measurements[0] ?? null
   const rangeDelta = useMemo(() => {
     if (series.length < 2) return latest?.deltaKg ?? null
     return Number((series.at(-1)!.weightKg - series[0]!.weightKg).toFixed(2))
@@ -310,6 +321,7 @@ export function TrendsPage() {
           initialPeriod={period}
           idealRange={idealRange}
           catName={profile?.name ?? analysis.catName}
+          measurements={boardMeasurements}
         />
       ) : null}
 
@@ -369,7 +381,7 @@ export function TrendsPage() {
       <section className={styles.recent} aria-label="近期体重变化" style={{ ['--i' as string]: 3 }}>
         <h2 className={styles.sectionTitle}>近期变化</h2>
         <ul className={styles.timeline}>
-          {measurements.slice(0, 6).map((m) => (
+          {(usingLive ? boardMeasurements : measurements).slice(0, 6).map((m) => (
             <li key={m.sessionId} className={styles.tlRow}>
               <div className={styles.tlMain}>
                 <span className={styles.tlDay}>{formatRelativeDay(m.lockedAt)}</span>

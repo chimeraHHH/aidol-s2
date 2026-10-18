@@ -324,7 +324,9 @@ export function SettingsPage() {
         {device?.lastError ? <p className={styles.avatarError}>{device.lastError}</p> : null}
         {!isDemo && !connected && !device?.supportProblem ? (
           <p className={styles.deviceHint}>
-            点「连接小咪」后，在 Chrome 弹窗里选择 <code>cu.JDY-31-SPP</code>。
+            推荐：先保持 <code>PhysicalScaleReader</code> 与{' '}
+            <code>python3 start_viewer.py</code> 运行，再点「连接小咪」（本机桥接，无需选串口）。
+            桥接未启动时，才会弹出 Chrome 串口选择器，请选 <code>cu.JDY-31-SPP</code>。
           </p>
         ) : null}
         <div className={`${styles.cardActions} ${styles.cardActionsRow}`}>

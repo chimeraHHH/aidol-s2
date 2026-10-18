@@ -11,8 +11,8 @@ export interface AppServices {
 
 /**
  * Composition root — swap implementations here.
- * device：ScaleDeviceService，实物小咪走 Web Serial（JDY-31 蓝牙串口），
- * 没有硬件时切到「演示模式」，用固件同格式的模拟数据流。
+ * device：ScaleDeviceService——实物优先走本机原生桥接（PhysicalScaleReader → SSE），
+ * 其次 Chrome Web Serial；没有硬件时切「演示模式」。
  * 旧的纯模拟实现仍保留在 MockDeviceService。
  */
 export function createServices(): AppServices {
