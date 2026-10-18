@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#087f70">
+  <meta name="description" content="小咪健康秤蓝牙串口测试台：连接 JDY-31、接收 GBK 报文、发送测试命令并查看原始数据。">
+  <title>小咪 · 蓝牙串口实验台</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23087f70'/%3E%3Cpath d='M10 24V12l8 5h4l8-5v12c0 10-20 10-20 0Z' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header class="topbar"><a class="brand" href="./" aria-label="小咪设备实验台首页"><span class="mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M9 25V11l9 5h4l9-5v14c0 11-22 11-22 0Z" fill="currentColor"/><path d="M16 24h1m7 0h1" stroke="#087f70" stroke-width="3" stroke-linecap="round"/></svg></span><b>小咪<span class="brand-divider">/</span><span>设备实验台</span></b></a><div class="top-actions"><span class="local-note"><i></i> 数据仅保留在本浏览器</span><button id="help" class="quiet">使用说明 ↗</button></div></header>
+<main>
+  <section class="intro"><div><p class="eyebrow">AIDOL DEVICE LAB <span>WEB 1.0</span></p><h1>蓝牙串口实验台<span class="title-dot">.</span></h1><p class="lead">连接、收发、观察。把开发板的原始读数带到浏览器。</p></div><span id="global-status" class="status-pill"><i></i> 未连接设备</span></section>
+  <div id="source-banner" class="source-banner" role="status" hidden></div>
+  <div class="workspace">
+    <aside>
+      <section class="panel connection-panel"><div class="section-heading"><h2><span class="section-number">01</span>设备连接</h2><span class="tiny-label">CONNECTION</span></div>
+        <div class="segmented" role="group" aria-label="测试方式"><button id="mode-real" class="active" aria-pressed="true">真实设备</button><button id="mode-demo" aria-pressed="false">演示测试</button></div>
+        <div class="device-illustration" aria-hidden="true"><svg viewBox="0 0 250 110"><path d="M55 83h140" stroke="#d6e9e2" stroke-width="2"/><rect x="67" y="30" width="116" height="51" rx="14" fill="#eef6f2" stroke="#9ac3b2"/><rect x="99" y="41" width="52" height="22" rx="5" fill="#d4e9df"/><path d="m91 44-6 5 6 5m68-10 6 5-6 5" stroke="#81b09a" fill="none" stroke-width="2"/><path d="M119 15v13m12-13v13m-6-22v16" stroke="#087f70" stroke-width="2" stroke-linecap="round"/><circle cx="174" cy="37" r="3" fill="#087f70"/></svg></div>
+        <div class="target"><span id="target-title">JDY-31-SPP</span><span id="target-kind">经典蓝牙串口 / SPP</span></div>
+        <label class="field">连接方式<select id="transport"><option value="bluetooth">JDY-31 经典蓝牙</option><option value="serial">USB / 系统串口</option></select></label>
+        <div class="field-row"><label class="field">波特率<select id="baud"><option>9600</option><option>19200</option><option>38400</option><option>57600</option><option>115200</option></select></label><label class="field">接收编码<select id="encoding"><option value="gbk">GBK（原板默认）</option><option value="utf-8">UTF-8</option></select></label></div>
+        <details class="advanced"><summary>更多串口设置<span>8 · N · 1</span></summary><div class="field-row"><label class="field">数据位<select id="data-bits"><option>8</option><option>7</option></select></label><label class="field">停止位<select id="stop-bits"><option>1</option><option>2</option></select></label><label class="field">校验<select id="parity"><option value="none">无</option><option value="even">偶</option><option value="odd">奇</option></select></label></div></details>
+        <button id="connect" class="primary connect-button"><span>⌁</span> 选择并连接设备</button><button id="disconnect" class="disconnect-button" hidden>断开连接</button>
+        <p id="connection-note" class="connection-note">先在系统蓝牙中配对 JDY-31-SPP，默认配对码为 1234。连接后先观察接收内容。</p>
+        <div id="capability" class="capability"><i></i><span>正在检查浏览器支持…</span></div>
+      </section>
+      <section class="panel quick-panel"><div class="section-heading"><h2>快速指令</h2><span class="tiny-label">MANUAL SEND</span></div><p class="muted compact">点击才发送，默认不附加换行。</p>
+        <button class="command" data-command="*%#"><span><b>连接测试</b><small>原板说明</small></span><code>*%#</code><span>↗</span></button>
+        <button class="command" data-command="*BMI#"><span><b>请求 BMI</b><small>原板说明</small></span><code>*BMI#</code><span>↗</span></button>
+        <details class="other-commands"><summary>修复版固件命令</summary><button class="command" data-command="*%"><b>连接测试</b><code>*%</code><span>↗</span></button><button class="command" data-command="*BM0#"><b>请求 BMI</b><code>*BM0#</code><span>↗</span></button></details>
+      </section>
+      <div class="side-foot"><span class="dot"></span><span>先验证报文，再验证实物读数。<br>本页面不会更新开发板固件。</span></div>
+    </aside>
+    <div class="main-column">
+      <section class="metrics" aria-label="接收到的设备读数">
+        <article class="metric panel"><div class="metric-title">体重 <span>WEIGHT</span></div><div class="metric-value"><strong id="weight">—</strong><span id="weight-unit">kg</span></div><div id="weight-note" class="metric-note">等待设备报文</div></article>
+        <article class="metric panel"><div class="metric-title">距离 / 身高 <span>DISTANCE</span></div><div class="metric-value"><strong id="height">—</strong><span id="height-unit">m</span></div><div id="height-note" class="metric-note">按设备原始字段显示</div></article>
+        <article class="metric panel"><div class="metric-title">设备 BMI <span>RAW VALUE</span></div><div class="metric-value"><strong id="bmi">—</strong></div><div id="bmi-note" class="metric-note">不作猫咪健康判定</div></article>
+      </section>
+      <section class="panel chart-panel"><div class="section-heading"><h2><span class="section-number">02</span>重量变化</h2><div class="chart-meta"><span id="sample-count">0 个样本</span><span id="data-origin" class="origin">等待数据</span></div></div>
+        <div class="chart-wrap"><svg id="chart" viewBox="0 0 900 190" role="img" aria-label="当前会话最近120个体重样本"><defs><linearGradient id="chart-fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#168b72" stop-opacity=".15"/><stop offset="100%" stop-color="#168b72" stop-opacity="0"/></linearGradient></defs><g class="chart-grid"><path d="M50 28H880M50 78H880M50 128H880M50 168H880"/></g><g id="chart-axis"></g><path id="chart-area" fill="url(#chart-fade)"/><path id="chart-path" fill="none" stroke="#13836f" stroke-width="2.5" stroke-linejoin="round"/><circle id="chart-dot" r="4" fill="#13836f" hidden/></svg><div id="chart-empty" class="chart-empty"><span>⌁</span><b>等待第一条重量报文</b><p>连接真实设备，或点击左侧「演示测试」体验。</p></div></div>
+        <div class="chart-footer"><span id="first-sample">当前会话</span><span>设备上报值 · 不做平滑或标定</span><span id="last-sample">最近 120 个样本</span></div>
+      </section>
+      <section class="panel terminal-panel"><div class="section-heading"><h2><span class="section-number">03</span>收发终端</h2><div class="terminal-tools"><select id="view-mode" aria-label="终端显示模式"><option value="text">文本</option><option value="hex">HEX</option></select><button id="pause" class="quiet" aria-pressed="false">暂停显示</button><button id="export" class="quiet">导出</button><button id="clear" class="quiet">清空</button></div></div>
+        <div class="terminal-status"><span><i class="rx-dot"></i> RX <b id="rx-count">0</b> B</span><span><i class="tx-dot"></i> TX <b id="tx-count">0</b> B</span><span id="last-received">尚未接收</span><span id="ack" hidden>✓ Test Ok!</span></div>
+        <div id="terminal" class="terminal" role="log" aria-label="原始串口收发日志" tabindex="0"><div id="terminal-empty" class="terminal-empty"><span>›_</span><p>连接后，原始收发报文会出现在这里。<br><small>支持 GBK 中文、HEX 和带时间戳的日志导出。</small></p></div></div>
+        <form id="send-form" class="send-form"><div class="send-input"><select id="send-mode" aria-label="发送格式"><option value="text">ASCII</option><option value="hex">HEX</option></select><input id="send-text" aria-label="发送内容" autocomplete="off" placeholder="输入命令，例如 *%#" maxlength="192"><kbd>↵</kbd></div><select id="line-ending" aria-label="发送换行符"><option value="">不加换行</option><option value="crlf">CRLF</option><option value="lf">LF</option><option value="cr">CR</option></select><button id="send" class="primary" type="submit">发送 ↑</button></form>
+      </section>
+      <div class="bottom-row"><span>原始值和异常值都会保留；称重精度需通过实物标定验证。</span><div><button id="import" class="quiet">导入报文回放 ↗</button><input id="import-file" type="file" accept=".txt,.bin,.hex" hidden></div></div>
+    </div>
+  </div>
+  <footer><span>小咪 AIDOL <span class="footer-separator">/</span> Hardware, with a little personality.</span><span>JDY-31 · SPP · GBK</span></footer>
+</main>
+<div id="toast" class="toast" role="status" hidden></div>
+<dialog id="help-dialog"><div class="dialog-heading"><div><p class="eyebrow">QUICK START</p><h2>开始测试，只需三步。</h2></div><button id="close-help" class="quiet" aria-label="关闭说明">✕</button></div><ol class="steps"><li><b>配对设备</b><p>给 JDY-31 供电，在当前电脑或手机的系统蓝牙设置中配对 JDY-31-SPP，默认配对码 1234。同一时间只让一个串口工具占用模块。</p></li><li><b>用 Chrome 打开本页并连接</b><p>电脑使用新版 Chrome；安卓使用 Chrome 138 或更新版本。点击「选择并连接设备」，在浏览器选择器中选中模块。Safari 等浏览器可能不提供所需接口。</p></li><li><b>先看接收，再发测试命令</b><p>默认 9600、8N1、GBK。周期报文无需手动请求。点击连接测试，查看 Test Ok!。供应方与修复版命令不同，无回执时请保留原始日志对照固件。</p></li></ol><div class="help-note"><b>没有设备，也能先测试页面</b><p>选择「演示测试」后点「启动演示」，或导入 TXT / BIN / HEX 报文。演示和回放始终有来源标识，不会充当实测值。进入真实设备模式会清空演示指标。</p></div><p class="muted">真机连接需要 HTTPS 或当前设备自己的 localhost。手机访问电脑的普通 HTTP 局域网地址不满足这个条件。若在内嵌浏览器中连接受限，请在独立 Chrome 标签页打开。</p><p class="help-sources">浏览器能力来源：<a href="https://developer.chrome.com/blog/serial-over-bluetooth" target="_blank" rel="noreferrer">Chrome 经典蓝牙串口</a> · <a href="https://developer.chrome.com/release-notes/138#web_serial_over_bluetooth_on_android" target="_blank" rel="noreferrer">Android 支持说明</a></p></dialog>
+<script type="module" src="./app.js"></script>
+</body></html>

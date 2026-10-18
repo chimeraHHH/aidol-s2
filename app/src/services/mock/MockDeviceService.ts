@@ -48,6 +48,14 @@ export class MockDeviceService implements IDeviceService {
     this.device = { ...this.device, connection: 'disconnected' }
   }
 
+  subscribe(): () => void {
+    return () => {}
+  }
+
+  async setMode(): Promise<DeviceInfo> {
+    return { ...this.device }
+  }
+
   startWeighSession(callbacks: WeighSessionCallbacks): () => void {
     const signal = { cancelled: false }
     const cancel = () => {

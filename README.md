@@ -23,6 +23,8 @@
 
 - [项目简介](#项目简介)
 - [在线演示](#在线演示)
+- [App 连接小咪实物秤（蓝牙）](#app-连接小咪实物秤蓝牙)
+- [实物蓝牙串口联调](#实物蓝牙串口联调)
 - [功能地图](#功能地图)
 - [信息架构与路由](#信息架构与路由)
 - [设计语言](#设计语言)
@@ -63,6 +65,84 @@
 | 源码 | https://github.com/chimeraHHH/aidol-s2 |
 
 建议用手机浏览器打开，或桌面端拉窄窗口体验全屏；宽屏会看到带 Dynamic Island 的手机框。
+
+---
+
+## App 连接小咪实物秤（蓝牙）
+
+App 已内置小咪的蓝牙连接：在本机用 Chrome 打开 App，就能直接连上小咪猫窝秤，实时体重流进「称重」「健康」「我的」页面。
+
+**为什么用 Web Serial 而不是 Web Bluetooth：** 小咪上的 JDY-31 是**经典蓝牙 SPP（串口）**模块，Web Bluetooth 只支持低功耗蓝牙（BLE），连不上它。macOS 系统蓝牙配对后会生成串口 `/dev/cu.JDY-31-SPP`，Chrome 通过 Web Serial 打开这个串口即可收数据（2026-10-17 已实测，见下一节）。
+
+### 1. 配对（只需一次）
+
+1. 给小咪通电。
+2. Mac「系统设置 → 蓝牙」里找到 **`JDY-31-SPP`**，点连接；要配对码时输入 **`1234`**。
+3. 可选验证：终端执行 `ls /dev/cu.*`，应能看到 `/dev/cu.JDY-31-SPP`。
+4. 关掉其他占用小咪的程序（手机串口助手、`firmware/` 里的网页实验台或原生接收工具），一个串口同一时间只能被一个程序打开。
+
+### 2. 本地运行 App
+
+```bash
+cd app
+npm install --legacy-peer-deps
+npm run dev          # 打开 http://localhost:5173
+```
+
+必须用 **Chrome（或 Edge）**，并且地址是 **`http://localhost`** 或 `127.0.0.1`（Web Serial 只在安全上下文可用；局域网 IP 的 http 地址不行，Safari / 微信内置浏览器也不行）。也可以 `npm run build && npm run preview`（端口 4173）。
+
+### 3. 在 App 里连接
+
+1. 底栏 **「我的」→「猫窝体重秤」** 卡片，选 **「实物蓝牙」**（在 localhost + Chrome 下默认就是它）。
+2. 点 **「连接小咪」**，Chrome 弹出设备选择器，选 **`cu.JDY-31-SPP`**（如果同时出现 `JDY-31-SPP - Paired`，已验证可用的是 `cu.` 那个），点「连接」。
+3. 状态变成「已连接」，卡片里出现 **实时读数 x.x kg**，每 1–1.5 秒刷新一次。
+4. 点 **「开始测量」**（或健康页的称重入口）：空窝时提示「请让小猫上秤」→ 猫进窝读数跳动 →**连续 3 帧相差 ≤0.1 kg** 自动锁定 → 保存记录，健康页「当前体重」和趋势同步更新。
+5. 同一浏览器再次打开时会自动重连已授权过的小咪；没连上就再点一次「连接小咪」。
+
+**断开与异常：** 点「断开连接」主动断开；秤关机、蓝牙掉线时状态自动变为「未连接」并提示原因，称重中断会提示重新连接。读数超过 30 kg（如未去皮的 `963.9Kg`）不会被锁定，只提示检查秤。
+
+### 4. 没有硬件：演示模式
+
+「我的 → 猫窝体重秤」切到 **「演示模式」**（或称重页点「没有硬件？用演示模式」）。App 会按固件**完全相同的 GBK 报文格式**生成模拟数据流（空窝 → 进窝晃动 → 趴稳 → 离开），还会随机拆包、混入噪声字节，走和实物相同的解析链路。演示数据在界面上标注「演示数据 · 非实物测量」。线上 Vercel 版本（非 localhost）默认就是演示模式。
+
+### 数据协议（固件 → App）
+
+| 项 | 值 |
+|----|----|
+| 链路 | JDY-31 经典蓝牙 SPP → macOS `cu.JDY-31-SPP` → Chrome Web Serial |
+| 串口参数 | 9600 baud，8 数据位，无校验，1 停止位，无流控 |
+| 编码 | GBK 文本，CR/LF 分行 |
+| 一帧 | `身高:1.70m 体重:3.2Kg ⏎ BMI值:--.- ⏎⏎`（约 38 字节，每 1–1.5 秒一帧，设备主动推送，App 不发送任何命令） |
+| 兼容写法 | `H:0.06m G:963.9Kg`、`W:3200g`、`重量：0.0kg`、`距离：0.06m` |
+| 取用字段 | 体重（kg / g 自动换算成 kg）；身高 / 距离与设备 BMI 只透传、不用于猫咪健康判断；`--.-` 视为空值 |
+
+代码位置：`app/src/services/serial/`
+
+- `scaleProtocol.ts`：分行解码（GBK 汉字跨包、无换行长噪声保护）、字段解析、读数组帧、稳定判定、演示报文生成
+- `webSerial.ts`：Web Serial 连接 / 读循环 / 断开清理 / 错误提示（移植自 `firmware/health-scale-51/web-client`）
+- `demoScaleSource.ts`：演示模式的模拟数据流
+- `ScaleDeviceService.ts`：实现 `IDeviceService`，在 `createServices.ts` 注入；UI 只通过 `useAppData()` 拿 `device`（状态、`liveReading`）和 `connectDevice / disconnectDevice / setDeviceMode`
+
+自测（协议、拆包、噪声、稳定锁定、连接 / 取消 / 掉线、演示流程）：
+
+```bash
+cd app && npm run test:serial
+```
+
+---
+
+## 实物蓝牙串口联调
+
+新增独立的 [JDY-31 健康秤网页实验台](firmware/health-scale-51/README.md)，用于接收开发板真实串口报文、查看重量曲线和调试 ASCII / HEX 命令。
+
+```sh
+cd firmware/health-scale-51/web-client
+python3 serve.py --port 18765
+```
+
+在 Chrome 打开 `http://127.0.0.1:18765`。macOS 已验证的连接路径为「真实设备」→「USB / 系统串口」→ `cu.JDY-31-SPP`，参数 9600、8-N-1、GBK。直接蓝牙路径出现 `SDP query timeout` 时使用此系统映射串口。
+
+2026-10-17 已验证网页实时接收，RX 与样本数连续增长；[实测汇总](firmware/health-scale-51/validation/web-live-20261017.json) 单独记录传输验证与尚未验证的测量精度。该实验台与上面的产品业务页面分开运行。
 
 ---
 
@@ -168,6 +248,7 @@ npm run dev
 | `npm run build` | `tsc -b` + Vite 生产构建 |
 | `npm run preview` | 预览 `dist` |
 | `npm run lint` | Oxlint |
+| `npm run test:serial` | 小咪蓝牙串口协议与连接自测（Node 内置测试器） |
 
 ---
 
@@ -229,7 +310,7 @@ aidol-s2/
 
 服务层用接口隔离，方便赛后接真机 / 真后端：
 
-1. **接真实硬件**：实现 `IDeviceService`，在 `createServices.ts` 注入。  
+1. **接真实硬件**：已用 `ScaleDeviceService`（Web Serial + 演示模式）实现 `IDeviceService` 并在 `createServices.ts` 注入；以后换 BLE 硬件，再写一个实现替换即可。  
 2. **接后端**：实现 `ICatRepository`，替换 `LocalCatRepository`；形象生成已走 `server` + `services/api/avatarApi.ts`。  
 3. **接大模型**：在 `server/src/providers` 扩展 Seedream / Seedance / Chat；陪伴对话走 `POST /api/companion/chat`（`server/agent` 人格文件 + Memory）；密钥只放 `server/.env`。  
 4. **新页面**：在 `features/<name>` 新增，挂到 `app/router.tsx`，必要时加 Tab。  
@@ -239,7 +320,7 @@ aidol-s2/
 // app/src/services/createServices.ts（示意）
 export function createServices() {
   return {
-    device: new MockDeviceService(),   // → 换成真实 BLE 实现
+    device: new ScaleDeviceService({ baseDevice: SEED_DEVICE }), // 实物串口 + 演示模式
     cat: new LocalCatRepository(),     // → 换成 API Repository
   }
 }
@@ -249,7 +330,7 @@ export function createServices() {
 
 ## 数据与 Mock
 
-- 猫咪档案、设备状态、陪伴亲密度、测量记录：Mock + `localStorage`
+- 猫咪档案、陪伴亲密度、测量记录：Mock + `localStorage`；设备状态与体重来自小咪实物（蓝牙串口）或演示模式
 - 健康页体重曲线：可由 `scripts/generate_kitten_weight_sim.py` 生成后供 `features/trends/data` 使用
 - **体脂率等健康相关展示仅为原型演示**；若改为人工录入，请在 UI 标明数据来源
 

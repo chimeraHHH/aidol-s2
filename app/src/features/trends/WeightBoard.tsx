@@ -9,12 +9,9 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react'
 import { createPortal } from 'react-dom'
+import type { Measurement } from '@/domain/types'
 import { formatDelta } from '@/shared/lib/format'
-import {
-  SIM_ANALYSIS,
-  SIM_XLSX_URL,
-  simBoardSeries,
-} from './data/kittenSim'
+import { SIM_ANALYSIS, SIM_XLSX_URL, simBoardSeries } from './data/kittenSim'
 import {
   formatNestDelta,
   formatNestHours,
@@ -22,6 +19,7 @@ import {
 } from './nestPresence'
 import {
   PERIODS,
+  buildBoardSeries,
   periodMeta,
   type SeriesPoint,
   type WeightPeriod,
@@ -34,9 +32,13 @@ interface WeightBoardProps {
   initialPeriod: WeightPeriod
   idealRange: { min: number; max: number }
   catName: string
+  /** 实物 / 称重写入的测量记录；有数据时优先驱动看板，不再只用模拟曲线 */
+  measurements?: Measurement[]
 }
 
 const DAY_CHART_WINDOW = 28
+/** 与 AppDataProvider 一致：不足 5kg 不进看板 */
+const BOARD_MIN_KG = 5
 
 export function WeightBoard({
   open,
@@ -44,15 +46,23 @@ export function WeightBoard({
   initialPeriod,
   idealRange,
   catName,
+  measurements = [],
 }: WeightBoardProps) {
-  const [period, setPeriod] = useState<WeightPeriod>(initialPeriod)
-  const [index, setIndex] = useState(() =>
-    Math.max(0, simBoardSeries(initialPeriod).length - 1),
+  const liveMeasurements = useMemo(
+    () => measurements.filter((m) => m.weightKg >= BOARD_MIN_KG),
+    [measurements],
   )
+  const usingLive = liveMeasurements.length > 0
+
+  const [period, setPeriod] = useState<WeightPeriod>(initialPeriod)
+  const [index, setIndex] = useState(0)
   const drag = useRef<{ x: number; i: number; active: boolean } | null>(null)
   const fillId = useId().replace(/:/g, '')
 
-  const series = useMemo(() => simBoardSeries(period), [period])
+  const series = useMemo(() => {
+    if (usingLive) return buildBoardSeries(liveMeasurements, period)
+    return simBoardSeries(period)
+  }, [liveMeasurements, period, usingLive])
   const analysis = SIM_ANALYSIS
   const nest = useMemo(() => getNestPresence(), [])
   const latestIndex = Math.max(0, series.length - 1)
@@ -179,12 +189,17 @@ export function WeightBoard({
           <div className={styles.headCenter}>
             <div className={styles.headTitle}>体重看板</div>
             <div className={styles.headSub}>
-              {catName} · Excel模拟分析 · {periodMeta(period).boardHint}
+              {catName} ·{' '}
+              {usingLive ? '实物称重记录' : 'Excel模拟分析'} · {periodMeta(period).boardHint}
             </div>
           </div>
-          <a className={styles.xlsxLink} href={SIM_XLSX_URL} download aria-label="下载Excel数据">
-            <SheetIcon />
-          </a>
+          {usingLive ? (
+            <span className={styles.xlsxLink} aria-hidden />
+          ) : (
+            <a className={styles.xlsxLink} href={SIM_XLSX_URL} download aria-label="下载Excel数据">
+              <SheetIcon />
+            </a>
+          )}
         </header>
 
         <div className={styles.body}>

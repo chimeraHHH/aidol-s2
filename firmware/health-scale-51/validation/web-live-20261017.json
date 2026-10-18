@@ -1,0 +1,40 @@
+{
+  "tested_on": "2026-10-17",
+  "timezone": "Asia/Shanghai",
+  "source": "physical_device",
+  "simulation": false,
+  "target_name": "JDY-31-SPP",
+  "platform": "macOS",
+  "browser": "Google Chrome 155",
+  "direct_bluetooth_error": "SDP query timeout",
+  "working_transport": "Web Serial via macOS mapped serial device",
+  "web_transport_selection": "USB / 系统串口",
+  "chooser_device": "cu.JDY-31-SPP",
+  "serial_settings": {
+    "baud_rate": 9600,
+    "data_bits": 8,
+    "parity": "none",
+    "stop_bits": 1,
+    "encoding": "GBK"
+  },
+  "native_receiver": {
+    "paired": true,
+    "spp_service_uuid": "0x1101",
+    "rfcomm_channel": 1,
+    "received_bytes": 720,
+    "receive_events": 8
+  },
+  "web_observations": [
+    {"local_time": "22:29:16", "status": "connected", "mode": "real"},
+    {"local_time": "22:29:33", "samples": 13, "received_bytes": 1170, "sent_bytes": 0},
+    {"local_time": "22:29:49", "samples": 26, "received_bytes": 2340, "sent_bytes": 0},
+    {"local_time": "22:29:55", "samples": 31}
+  ],
+  "live_receive_growth_verified": true,
+  "web_decoder_verified_on_native_received_bytes": true,
+  "physical_commands_verified": false,
+  "calibrated_measurements_verified": false,
+  "height_and_bmi_validity_verified": false,
+  "firmware_flashed": false,
+  "evidence_scope": "Aggregate summary from native receiver events, Chrome device log, web counters and a local screenshot. Device addresses, measurement values, raw logs and screenshots are retained locally and are not included in this repository."
+}
